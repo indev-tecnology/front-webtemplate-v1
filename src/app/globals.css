@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { 
+    color-scheme: light; 
+    --radius: 14px;
+
+
+    --surface: 255 255 255; /* blanco */
+    --background: 248 250 252; /* gris muy claro */
+    --foreground: 15 23 42; /* slate-900 */
+    --muted: 241 245 249; /* slate-100 */
+    --muted-foreground: 100 116 139; /* slate-500 */
+
+
+    --border: 226 232 240;
+}
+
+.dark {
+  --surface: 15 23 42;
+  --background: 2 6 23;
+  --foreground: 241 245 249;
+  --muted: 30 41 59;
+  --muted-foreground: 148 163 184;
+  --border: 51 65 85;
+}
+
+/* Utilidades base */
+.bg-surface { background-color: rgb(var(--surface)); }
+.bg-background { background-color: rgb(var(--background)); }
+.text-foreground { color: rgb(var(--foreground)); }
+.text-muted-foreground { color: rgb(var(--muted-foreground)); }
+.border-token-border { border-color: rgb(var(--border)); }
+.bg-muted { background-color: rgb(var(--muted)); }
+
+* { outline-offset: 2px; }
+:focus-visible { outline: 2px solid #2563eb; }
+body { @apply text-gray-900 bg-white; }
+a { @apply text-blue-700; }
+
+/* small decorative animations used by Hero */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(12px, -8px) scale(1.04); }
+  66% { transform: translate(-10px, 6px) scale(.98); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes blob-slow {
+  0% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(8px, -6px) scale(1.03); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes pulse-slow {
+  0% { opacity: .18; transform: scale(1); }
+  50% { opacity: .28; transform: scale(1.03); }
+  100% { opacity: .18; transform: scale(1); }
+}
+
+.animate-blob { animation: blob 8s ease-in-out infinite; transform-origin: center; }
+.animate-blob-delay { animation: blob 10s ease-in-out .6s infinite; transform-origin: center; }
+.animate-pulse-slow { animation: pulse-slow 6s ease-in-out infinite; }
+
+@keyframes drift {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(-1deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes wave {
+  0% { transform: translateX(0) skewX(0deg); }
+  50% { transform: translateX(-6px) skewX(-1deg); }
+  100% { transform: translateX(0) skewX(0deg); }
+}
+
+.animate-drift { animation: drift 7s ease-in-out infinite; }
+.animate-wave { animation: wave 9s ease-in-out infinite; }
