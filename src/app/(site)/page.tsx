@@ -28,6 +28,7 @@ function InfoClave() {
   );
 }
 
+
 async function dataHero(data:any[]): Promise<HeroSlide[]> {
   return data.map( a => ({
     title: a.title,
