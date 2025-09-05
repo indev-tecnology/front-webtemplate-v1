@@ -4,7 +4,7 @@ const config: Config = {
   theme: {
     container: { center: true, padding: "1rem" },
     extend: {
-      fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
+      fontFamily: { sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"] },
       colors: {
         brand: {default: "#2da57f", 50:"#f2f9f6", 100:"#d9f1e6", 200:"#b4e3cf", 500:"#2da57f", 600:"#1f8668", 700:"#1c6a56" },
         accent: { 600:"#16a34a" },

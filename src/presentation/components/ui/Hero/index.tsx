@@ -524,7 +524,9 @@ export function HeroSlider({
                   alt={current?.title || "Hero image"}
                   fill
                   sizes="(min-width: 1280px) 560px, (min-width: 1024px) 480px, (min-width: 640px) 50vw, 90vw"
-                  priority
+                  // Only preload when the image column is visible on initial viewport
+                  // to avoid browser warnings about unused preloads on mobile.
+                  priority={!hideImageOnMobile && index === 0}
                   // Prefer contain on mobile to avoid awkward crops
                   className={cn(
                     imageFit === "cover"
