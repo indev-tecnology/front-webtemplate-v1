@@ -55,6 +55,10 @@ export type HeroSliderProps = {
   showIndicators?: boolean;
   showArrows?: boolean;
   imageFit?: "cover" | "contain";
+  /** Hide the image column on small screens for better readability */
+  hideImageOnMobile?: boolean;
+  /** Hide navigation arrows on small screens */
+  hideArrowsOnMobile?: boolean;
   bottomContent?: React.ReactNode;
 };
 
@@ -270,32 +274,36 @@ function usePrefersReducedMotion(forced?: boolean) {
 function aspectHeights(aspect: NonNullable<HeroSliderProps["aspect"]>) {
   switch (aspect) {
     case "compact":
-      return "h-[20svh] md:h-[24svh] lg:h-[28svh]";
+      // Add min-height fallbacks to avoid tiny heroes on short viewports
+      return "min-h-[280px] sm:min-h-[320px] md:min-h-[280px] h-[22svh] sm:h-[32svh] md:h-[30svh] lg:h-[36svh]";
     case "wide":
-      return "h-[48svh] md:h-[58svh] lg:h-[64svh]";
+      return "min-h-[420px] sm:min-h-[480px] md:min-h-[520px] h-[50svh] md:h-[58svh] lg:h-[64svh]";
     case "tall":
-      return "h-[70svh] md:h-[78svh] lg:h-[84svh]";
+      return "min-h-[560px] sm:min-h-[640px] md:min-h-[700px] h-[70svh] md:h-[78svh] lg:h-[84svh]";
     default:
-      return "h-[58svh] md:h-[64svh] lg:h-[72svh]";
+      // standard
+      return "min-h-[440px] sm:min-h-[520px] md:min-h-[560px] h-[56svh] md:h-[64svh] lg:h-[72svh]";
   }
 }
 
 function typographyByAspect(aspect: NonNullable<HeroSliderProps["aspect"]>) {
   if (aspect === "compact") {
     return {
-      title: "text-3xl md:text-4xl lg:text-5xl",
-      desc: "text-xs md:text-sm lg:text-base",
+      title: "text-3xl sm:text-4xl lg:text-5xl",
+      desc: "text-sm sm:text-base",
       titleMargin: "mb-2",
       descMargin: "mb-4",
-      imageWrap: "relative mx-auto w-full max-w-md h-[60%] md:h-[70%]",
+      // Prefer aspect-based sizing for predictability on small screens
+      imageWrap: "relative mx-auto aspect-[4/3] w-full max-w-sm sm:max-w-md md:max-w-lg",
     } as const;
   }
   return {
     title: "text-4xl md:text-5xl lg:text-6xl",
-    desc: "text-sm md:text-base lg:text-lg",
+    desc: "text-base md:text-lg",
     titleMargin: "mb-3",
     descMargin: "mb-6",
-    imageWrap: "relative mx-auto aspect-[4/5] w-full max-w-md",
+    // Scale image progressively while keeping a stable aspect
+    imageWrap: "relative mx-auto aspect-[4/5] w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl",
   } as const;
 }
 
@@ -333,6 +341,8 @@ export function HeroSlider({
   showIndicators = true,
   showArrows = true,
   imageFit = "contain",
+  hideImageOnMobile = true,
+  hideArrowsOnMobile = true,
   bottomContent,
 }: HeroSliderProps) {
   const [index, setIndex] = useState(0);
@@ -455,9 +465,9 @@ export function HeroSlider({
 
       {/* Content */}
       {layout === "split" ? (
-        <div className={cn("relative z-10 mx-auto grid h-full w-full max-w-7xl grid-cols-1 items-center gap-8 px-6 md:grid-cols-2 md:px-10 lg:px-16")}> 
+        <div className={cn("relative z-10 mx-auto grid h-full w-full max-w-7xl grid-cols-1 items-center gap-6 sm:gap-8 lg:gap-12 px-6 md:grid-cols-2 md:px-10 lg:px-16")}>
           {/* Left content */}
-          <div className={cn("h-full flex items-center", contentPlacement === "left" ? "order-1" : "order-2")}> 
+          <div className={cn("h-full flex items-center", contentPlacement === "left" ? "order-1" : "order-2")}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
@@ -492,7 +502,14 @@ export function HeroSlider({
           </div>
 
           {/* Right image */}
-          <div className={cn("relative h-full flex items-center", contentPlacement === "left" ? "order-2" : "order-1")}> 
+          <div
+            className={cn(
+              "relative h-full items-center",
+              // Hide the image on small screens if requested
+              hideImageOnMobile ? "hidden sm:flex" : "flex",
+              contentPlacement === "left" ? "order-2" : "order-1"
+            )}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
@@ -506,9 +523,14 @@ export function HeroSlider({
                   src={current?.image || "/wex_default.png"}
                   alt={current?.title || "Hero image"}
                   fill
-                  sizes="(min-width: 1024px) 420px, (min-width: 640px) 50vw, 90vw"
+                  sizes="(min-width: 1280px) 560px, (min-width: 1024px) 480px, (min-width: 640px) 50vw, 90vw"
                   priority
-                  className={cn(imageFit === "cover" ? "object-cover" : "object-contain")}
+                  // Prefer contain on mobile to avoid awkward crops
+                  className={cn(
+                    imageFit === "cover"
+                      ? "object-contain sm:object-cover"
+                      : "object-contain"
+                  )}
                 />
               </motion.div>
             </AnimatePresence>
@@ -530,7 +552,7 @@ export function HeroSlider({
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
-              <div className={cn("relative overflow-hidden rounded-2xl p-6", tone.text)}>
+              <div className={cn("relative overflow-hidden rounded-2xl p-5 sm:p-6 md:p-8", tone.text)}>
                 <div
                   className={cn(
                     "absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br",
@@ -590,7 +612,10 @@ export function HeroSlider({
                 type="button"
                 aria-label="Previous slide"
                 onClick={prev}
-                className="z-30 absolute left-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full p-2 shadow-md ring-1 ring-black/10 bg-white/80 text-neutral-900 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/30 backdrop-blur-sm"
+                className={cn(
+                  "z-30 absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 items-center justify-center rounded-full p-2.5 sm:p-3 shadow-md ring-1 ring-black/10 bg-white/85 text-neutral-900 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/30 backdrop-blur-sm",
+                  hideArrowsOnMobile ? "hidden sm:inline-flex" : "inline-flex"
+                )}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -600,7 +625,10 @@ export function HeroSlider({
                 type="button"
                 aria-label="Next slide"
                 onClick={next}
-                className="z-30 absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full p-2 shadow-md ring-1 ring-black/10 bg-white/80 text-neutral-900 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/30 backdrop-blur-sm"
+                className={cn(
+                  "z-30 absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 items-center justify-center rounded-full p-2.5 sm:p-3 shadow-md ring-1 ring-black/10 bg-white/85 text-neutral-900 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/30 backdrop-blur-sm",
+                  hideArrowsOnMobile ? "hidden sm:inline-flex" : "inline-flex"
+                )}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -610,7 +638,7 @@ export function HeroSlider({
           )}
 
           {showIndicators && (
-            <div className="z-30 absolute bottom-4 inset-x-0 flex flex-col items-center gap-2 px-6">
+            <div className="z-30 absolute bottom-3 sm:bottom-4 inset-x-0 flex flex-col items-center gap-2 px-6">
               <div className="flex items-center justify-center gap-2">
                 {slides.map((_, i) => (
                   <button
@@ -619,7 +647,7 @@ export function HeroSlider({
                     aria-label={`Go to slide ${i + 1}`}
                     aria-current={i === index ? "true" : undefined}
                     className={cn(
-                      "h-2 w-2 rounded-full border border-black/20 transition-all",
+                      "h-2.5 w-2.5 sm:h-2 sm:w-2 rounded-full border border-black/20 transition-all",
                       i === index ? "bg-neutral-900" : "bg-neutral-400 hover:bg-neutral-500"
                     )}
                   />

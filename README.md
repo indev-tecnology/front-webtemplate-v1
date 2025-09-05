@@ -180,6 +180,93 @@ Esto crea:
 
 ---
 
+## 🎨 UI: HeroSlider (Hero responsivo)
+
+Componente de Hero con slider para destacados. Archivo: `src/presentation/components/ui/Hero/index.tsx`.
+
+### Uso básico (layout split)
+
+```tsx
+import { HeroSlider, type HeroSlide } from "@/presentation/components/ui/Hero";
+
+const slides: HeroSlide[] = [
+  {
+    id: "welcome",
+    title: "Bienvenido a nuestro sitio",
+    description: "Contenido dinámico con Next.js + MongoDB",
+    image: "/images/hero-1.png",
+    badge: "Nuevo",
+    cta: { label: "Conoce más", href: "/sobre-nosotros" },
+    tone: "indigo",
+  },
+  {
+    title: "Eventos y Anuncios",
+    description: "Gestionados desde MongoDB y revalidación",
+    image: "/images/hero-2.png",
+    tone: { bg: "from-brand-500 to-ink-900", accent: "bg-brand-600 text-white" },
+  },
+];
+
+export default function Page() {
+  return (
+    <HeroSlider
+      slides={slides}
+      layout="split"
+      aspect="standard"
+      imageFit="contain"
+      autoPlay
+      intervalMs={6000}
+      showIndicators
+      showArrows
+      hideImageOnMobile
+    />
+  );
+}
+```
+
+### Uso overlay (imagen de fondo)
+
+```tsx
+<HeroSlider
+  slides={slides}
+  layout="overlay"
+  overlay
+  aspect="wide"
+  imageFit="cover"
+  showArrows={false}
+  showIndicators
+/>
+```
+
+### Props
+
+- `slides: HeroSlide[]`: lista de slides.
+- `aspect: "compact" | "standard" | "wide" | "tall"` (default: `"compact"`).
+- `layout: "overlay" | "split"` (default: `"split"`).
+- `contentPlacement: "left" | "right"` (default: `"left"`).
+- `overlay: boolean` (solo `overlay`, default: `true`).
+- `autoPlay`, `intervalMs`, `pauseOnHover` (defaults: `true`, `6000`, `true`).
+- `showIndicators`, `showArrows` (defaults: `true`).
+- `hideArrowsOnMobile: boolean` (default: `true`, oculta flechas en móvil para un look más limpio).
+- `imageFit: "cover" | "contain"` (default: `"contain"`). En móvil se fuerza `contain` si elegiste `cover`.
+- `hideImageOnMobile: boolean` (default: `true`, oculta columna de imagen en móvil en `split`).
+- `bottomContent?: ReactNode` (contenido opcional en el borde inferior del Hero).
+
+### Tipo `HeroSlide`
+
+- `title` (requerido), `description?`, `image?`, `badge?`.
+- `cta?: { label: string; href: string; external?: boolean }`.
+- `tone?:` preset (`"indigo"`, `"brand"`, etc.) o personalizado `{ bg?, text?, ring?, accent?, shapes? }`.
+
+### Accesibilidad y rendimiento
+
+- Soporta `prefers-reduced-motion` automáticamente (reduce animaciones y autoplay).
+- Navegación con teclado (flechas) y `aria-*` en indicadores/flechas.
+- `next/image` con `sizes` por breakpoint para mejorar LCP.
+- Alturas y tipografías responsivas con `min-h` + `svh`; imágenes con `aspect-*` para evitar saltos.
+
+Tips: si hay mucho texto, usa `hideImageOnMobile`. Si la imagen es clave, mantén `imageFit="contain"` en móviles o cambia a `layout="overlay"` con `overlay` para legibilidad.
+
 ## 📚 Referencias
 
 - [Next.js Docs](https://nextjs.org/docs)
