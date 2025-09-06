@@ -1,10 +1,11 @@
 import { apiConsumer } from "@/presentation/adapters/apiConsumer";
 import TextLink from "@/presentation/components/ui/TextLink";
-import {HeroSlider, HeroSlide} from "@/presentation/components/ui/Hero";
+import {HeroSlider, SlideData} from "@/presentation/components/ui/Hero";
 import {Section} from "@/presentation/components/ui/SectionPage";
 import { Announcement } from "@/domain/entities/Announcement";
 import Gallery from "@/presentation/components/ui/Gallery";
 import {MosaicCards, MosaicItem} from "@/presentation/components/ui/CardMosaic";
+import FeatureLinks from "@/presentation/components/ui/FeaturesLinks";
 
 // Información clave
 function InfoClave() {
@@ -29,14 +30,14 @@ function InfoClave() {
 }
 
 
-async function dataHero(data:any[]): Promise<HeroSlide[]> {
+async function dataHero(data:any[]): Promise<SlideData[]> {
   return data.map( a => ({
     title: a.title,
     description: a.description,
     image: a.image?.url || '/images/wcs_default.png',
     cta: a.cta || null,
     badge: a.tags[0] || null,
-    tone: a.tone || 'indigo',
+    tone: a.tone,
   }));
 }
 
@@ -53,33 +54,29 @@ async function dataCards(data:any[]): Promise<MosaicItem[]> {
   }));
 }
 
-async function dataEvents() {
-  return (await apiConsumer.events()).map((e:any) => ({
-    id: e.id,
-    title: e.title,
-    description: e.description,
-    date: e.eventDate,
-    imageCover: e.image || null,
-    imageAlt: e.image?.alt || e.title,
-    href: `/events/${e.slug}`,
+async function dataFeatures() {
+  return (await apiConsumer.features()).map((e:any) => ({
+    label: e.label,
+    cta: e.cta || '#',
+    image: e.image || '/images/wcs_default.png',
+    brand: e.brand || 'gray',
   }));
-}
-
-async function onlyDataPage() {
-
-}
+};
 
 export default async function Home() {
   const announcements: Announcement[] = await apiConsumer.announcements();
-  const items: HeroSlide[] = await dataHero(announcements);
+  const items: SlideData[] = await dataHero(announcements);
   const cards = await dataCards(announcements);
-  const events = await dataEvents();
+  const features = await dataFeatures();
   return (
      <div className="flex flex-col">
-      <Section id="sectionHero" ariaLabel="Sección de bienvenida" tone="muted">
+      <Section id="sectionHero" ariaLabel="Sección de bienvenida" tone="surface" pad="xl">
         <HeroSlider slides={items}/>
       </Section>
-      <Section id="sectionCards" ariaLabel="Sección de tarjetas informativas">
+      <Section id="sectionEvents" ariaLabel="Sección sobre features" container={false} width="wide">
+        <FeatureLinks items={features} tonePrimary="muted" toneSecondary="muted"/>
+      </Section>
+      <Section id="sectionCards" ariaLabel="Sección de tarjetas informativas" tone="teal" pad="standard">
         <MosaicCards items={cards} columns={3} aspect="landscape" />
       </Section>
       {/* Información clave */}

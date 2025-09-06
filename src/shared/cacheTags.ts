@@ -6,4 +6,5 @@ export const TAGS = {
   ATTACHMENTS: "attachments",
   SERVICES: "services",
   AGREEMENTS: "agreements",
+  FEATURES: "features",
 } as const;

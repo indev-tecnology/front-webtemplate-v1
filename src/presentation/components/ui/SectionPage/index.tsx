@@ -1,25 +1,33 @@
 import { cn } from "@/shared/cn";
 
-type Tone = "none" | "surface" | "muted" | "brand";
-type Pad = "none" | "sm" | "md" | "lg";
+type Tone = "none" | "surface" | "muted" | "brand" | "blue" | "teal" | "green" | "violet" | "coral" | "sun" | "warm" | "muted";
+type Pad = "none" | "sm" | "md" | "xl" | "standard";
 type Width = "narrow" | "default" | "wide";
 
 const toneMap: Record<Tone, string> = {
   none: "",
-  surface: "bg-white",
-  muted: "bg-surface-50",
-  brand: "bg-brand-50",
+  surface: "bg-surface-50",
+  brand: "bg-brand-200",
+  blue: "bg-tone-blue-200",
+  teal: "bg-tone-teal-100",
+  green: "bg-tone-green-200",
+  violet: "bg-tone-violet-200",
+  coral: "bg-tone-coral-200",
+  sun: "bg-tone-sun-200",
+  warm: "bg-tone-warm-200",
+  muted: "bg-tone-muted-200",
 };
 const padMap: Record<Pad, string> = {
   none: "",
-  sm: "py-6",
-  md: "py-10",
-  lg: "py-16",
+  sm: "sm:py-4",
+  md: "md:py-8",
+  xl: "xl:py-16",
+  standard: "py-8 md:py-12 md:px-4 sm:px-8",
 };
 const widthMap: Record<Width, string> = {
   narrow: "max-w-3xl",
-  default: "max-w-6xl",
-  wide: "max-w-7xl",
+  default: "max-w-7xl",
+  wide: "max-w-6xl",
 };
 
 type BaseProps = {
@@ -39,7 +47,7 @@ export function Section({
   id,
   ariaLabel,
   tone = "none",
-  pad = "sm",
+  pad = "none",
   width = "default",
   container = true,
   className,
@@ -47,7 +55,7 @@ export function Section({
 }: BaseProps) {
   return (
     <Tag id={id} aria-label={ariaLabel} className={cn(toneMap[tone], padMap[pad], className)}>
-      <div className={cn(container ? "mx-auto px-6" : "", container && widthMap[width])}>
+      <div className={cn(container ? "mx-auto" : "", container && widthMap[width])}>
         {children}
       </div>
     </Tag>

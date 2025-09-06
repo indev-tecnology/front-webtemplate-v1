@@ -45,4 +45,6 @@ export const apiConsumer = {
 
   agreements: () => getJSON<Agreement[]>(`/api/agreements`, { tag: TAGS.AGREEMENTS }),
   agreement: (slug: string) => getJSON<Agreement>(`/api/agreements/${slug}`, { tag: TAGS.AGREEMENTS }),
+
+  features: () => getJSON<any[]>(`/api/features`, { tag: TAGS.FEATURES }),
 };
