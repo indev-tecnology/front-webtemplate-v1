@@ -6,18 +6,18 @@ const config: Config = {
     extend: {
       fontFamily: { sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"] },
       colors: {
-        brand: {default: "#2da57f", 50:"#f2f9f6", 100:"#d9f1e6", 200:"#b4e3cf", 500:"#2da57f", 600:"#1f8668", 700:"#1c6a56" },
+        brand: {DEFAULT: "#2da57f", 50:"#f2f9f6", 100:"#d9f1e6", 200:"#b4e3cf", 500:"#2da57f", 600:"#1f8668", 700:"#1c6a56" },
         accent: { 600:"#16a34a" },
         // extra tones for Hero component
         tone: {
-          blue: "#2563eb",
-          teal: "#0ea5a4",
-          green: "#16a34a",
-          violet: "#7c3aed",
-          coral: "#fb7185",
-          sun: "#f59e0b",
-          warm: "#f97316",
-          muted: "#64748b",
+          blue: {DEFAULT:"#2563eb", 50:"#eff6ff", 100:"#dbeafe", 200:"#bfdbfe", 500:"#2563eb", 600:"#1d4ed8", 700:"#1e40af" },
+          teal: {DEFAULT: "#0ea5a4" , 50:"#f0fdfa", 100:"#ccfbf1", 200:"#99f6e4", 500:"#0ea5a4", 600:"#089e9c", 700:"#047c7d" },
+          green: {DEFAULT: "#10b981" , 50:"#f0fdf4", 100:"#dcfce7", 200:"#bbf7d0", 500:"#10b981", 600:"#059669", 700:"#047857" },
+          violet: { DEFAULT: "#8b5cf6" , 50:"#f5f3ff", 100:"#ede9fe", 200:"#ddd6fe", 500:"#8b5cf6", 600:"#7c3aed", 700:"#6d28d9" },
+          coral: { DEFAULT: "#f43f5e" , 50:"#fff1f2", 100:"#ffe4e6", 200:"#fecdd3", 500:"#f43f5e", 600:"#e11d48", 700:"#be123c" },
+          sun:  { DEFAULT: "#eab308" , 50:"#fffbeb", 100:"#fef3c7", 200:"#fde68a", 500:"#eab308", 600:"#ca8a04", 700:"#a16207" },
+          warm: { DEFAULT: "#f97316" , 50:"#fff7ed", 100:"#ffedd5", 200:"#fed7aa", 500:"#f97316", 600:"#ea580c", 700:"#c2410c" }  ,
+          muted:  { DEFAULT: "#50665fff" , 50:"#f5f7fa", 100:"#e4e8ef", 200:"#cbd2e1", 500:"#50665f", 600:"#394b48", 700:"#273231" }
         },
         ink: { 900:"#0f172a", 700:"#334155", 500:"#64748b" },
         surface: { 0:"#ffffff", 50:"#f8fafc" },
