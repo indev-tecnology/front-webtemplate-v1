@@ -23,4 +23,14 @@ export class MongoEventRepository {
 
   return docs.map(map);
   }
+
+  async listLatest(limit = 10): Promise<Event[]> {
+    const c = await col(COL.EVENTS);
+    const docs = await c
+      .find({})
+      .sort({ startsAt: -1, createdAt: -1 })
+      .limit(limit)
+      .toArray();
+    return docs.map(map);
+  }
 }

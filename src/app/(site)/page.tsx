@@ -1,11 +1,13 @@
 import { apiConsumer } from "@/presentation/adapters/apiConsumer";
 import TextLink from "@/presentation/components/ui/TextLink";
 import {HeroSlider, SlideData} from "@/presentation/components/ui/Hero";
-import {Section} from "@/presentation/components/ui/SectionPage";
+import {Section, SectionHeader} from "@/presentation/components/ui/SectionPage";
 import { Announcement } from "@/domain/entities/Announcement";
 import Gallery from "@/presentation/components/ui/Gallery";
-import {MosaicCards, MosaicItem} from "@/presentation/components/ui/CardMosaic";
+import MosaicCards, {NewsItem, SectionData} from "@/presentation/components/ui/CardMosaic";
+import EventsPanel from "@/presentation/components/ui/EventsPanel";
 import FeatureLinks from "@/presentation/components/ui/FeaturesLinks";
+import type { Event } from "@/domain/entities/Event";
 
 // Información clave
 function InfoClave() {
@@ -41,19 +43,6 @@ async function dataHero(data:any[]): Promise<SlideData[]> {
   }));
 }
 
-async function dataCards(data:any[]): Promise<MosaicItem[]> {
-  return data.map( a => ({
-    id: a.id,
-    title: a.title,
-    description: a.description,
-    imageUrl: a.image?.url || '/images/wcs_default.png',
-    href: a.cta.href || null,
-    ctaLabel: a.cta.label || 'Más información',
-    badge: a.tags[0] || null,
-    tone: a.tone || 'brand',
-  }));
-}
-
 async function dataFeatures() {
   return (await apiConsumer.features()).map((e:any) => ({
     label: e.label,
@@ -63,21 +52,71 @@ async function dataFeatures() {
   }));
 };
 
+async function dataNews(data:any[]): Promise<NewsItem[]> {
+  return data.map( a => ({
+    id: a.id,
+    title: a.title,
+    description: a.description,
+    imageUrl: a.image?.url || '/images/wcs_default.png',
+    href: a.cta?.href || null,
+    ctaLabel: a.cta?.label || 'Más información',
+    badge: a.tags[0] || null,
+    tone: a.tone || 'brand',
+    publishedAt: a.publishedAt ? new Date(a.publishedAt) : undefined,
+  }));
+}
+
+async function dataEvents(data: any[]): Promise<NewsItem[]> {
+  return data.map((e: any) => ({
+    id: e.id,
+    title: e.title,
+    description: e.description,
+    imageUrl: e.image?.url || '/images/wcs_default.png',
+    startsAt: e.startsAt ? new Date(e.startsAt) : undefined,
+    href: e.slug ? `/eventos/${e.slug}` : undefined,
+    badge: e.location || undefined,
+  }));
+}
+
 export default async function Home() {
-  const announcements: Announcement[] = await apiConsumer.announcements();
+  const announcements: Announcement[] = await apiConsumer.announcements({ limit: 5, latest: true });
   const items: SlideData[] = await dataHero(announcements);
-  const cards = await dataCards(announcements);
   const features = await dataFeatures();
+  const cards: NewsItem[] = await dataNews(announcements);
+  const eventsRaw: any[] = await apiConsumer.events({ limit: 10, latest: true });
+  const eventsItems: NewsItem[] = await dataEvents(eventsRaw);
   return (
      <div className="flex flex-col">
-      <Section id="sectionHero" ariaLabel="Sección de bienvenida" tone="surface" pad="xl">
+      <Section id="sectionHero" ariaLabel="Sección de bienvenida" pad="xl" tone="green">
         <HeroSlider slides={items}/>
       </Section>
       <Section id="sectionEvents" ariaLabel="Sección sobre features" container={false} width="wide">
-        <FeatureLinks items={features} tonePrimary="muted" toneSecondary="muted"/>
+        <FeatureLinks items={features} tonePrimary="sun"/>
       </Section>
-      <Section id="sectionCards" ariaLabel="Sección de tarjetas informativas" tone="teal" pad="standard">
-        <MosaicCards items={cards} columns={3} aspect="landscape" />
+      <Section id="sectionCards" ariaLabel="Sección de noticias y eventos" pad="standard">
+        <SectionHeader title="Novedades y eventos" key={"seccion-novedades"}/>
+        <hr />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2">
+            <MosaicCards
+              title="Últimas novedades"
+              ctaLabel="Ver más"
+              ctaHref="/noticias"
+              tone="warm"
+              items={cards}
+            />
+          </div>
+          <div className="lg:col-span-1">
+            <EventsPanel
+              title="Próximos eventos"
+              ctaLabel="Ver todos"
+              ctaHref="/eventos"
+              tone="teal"
+              badgeTone="sun"
+              items={eventsItems}
+            />
+          </div>
+        </div>
       </Section>
       {/* Información clave */}
       <Section id="sectionInfoClave" ariaLabel="Sección de información clave">
