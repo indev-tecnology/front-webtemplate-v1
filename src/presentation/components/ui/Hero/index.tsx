@@ -1,695 +1,388 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import React, { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight, PlayCircle, PauseCircle } from 'lucide-react';
 
-function cn(...cls: Array<string | undefined | false | null>) {
-  return cls.filter(Boolean).join(" ");
+// Tipos para TypeScript
+export interface SlideData {
+  title: string;
+  description: string;
+  image: string;
+  brand?: string;
+  cta?: {
+    label: string;
+    href: string;
+    variant?: 'primary' | 'secondary';
+  };
+  // Use one of the configured tone keys (tailwind.config.ts -> theme.extend.colors.tone)
+  tone?:
+    | 'blue'
+    | 'teal'
+    | 'green'
+    | 'violet'
+    | 'coral'
+    | 'sun'
+    | 'warm'
+    | 'muted'
+    | (string & {});
 }
 
-export type HeroSlide = {
-  id?: string;
-  title: string;
-  description?: string;
-  image?: string;
-  badge?: string | null;
-  cta?: { label: string; href: string; external?: boolean } | null;
-  tone?:
-    | "indigo"
-    | "blue"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "info"
-    | "neutral"
-    | "brand"
-    | "teal"
-    | "green"
-    | "violet"
-    | "coral"
-    | "sun"
-    | "warm"
-    | "muted"
-    | {
-        bg?: string; // background gradient classes
-        text?: string; // text color classes
-        ring?: string; // ring color classes for badges
-        accent?: string; // CTA button classes
-        shapes?: string[]; // optional gradients for decorative shapes
-      };
-};
+interface HeroSliderProps {
+  slides: SlideData[];
+  autoPlayInterval?: number;
+  enableAutoPlay?: boolean;
+}
 
-export type HeroSliderProps = {
-  slides: HeroSlide[];
-  className?: string;
-  aspect?: "compact" | "wide" | "standard" | "tall";
-  layout?: "overlay" | "split";
-  contentPlacement?: "left" | "right";
-  overlay?: boolean; // only for overlay variant
-  autoPlay?: boolean;
-  intervalMs?: number;
-  pauseOnHover?: boolean;
-  reduceMotion?: boolean;
-  showIndicators?: boolean;
-  showArrows?: boolean;
-  imageFit?: "cover" | "contain";
-  /** Hide the image column on small screens for better readability */
-  hideImageOnMobile?: boolean;
-  /** Hide navigation arrows on small screens */
-  hideArrowsOnMobile?: boolean;
-  bottomContent?: React.ReactNode;
-};
-
-// Tone presets aligned with Tailwind palette keys used in the project
-const tonePresets: Record<
-  Extract<HeroSlide["tone"], string>,
-  { bg: string; text: string; ring: string; accent: string }
-> = {
-  indigo: {
-    bg: "from-tone-blue to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-blue/30",
-    accent: "bg-ink-900 text-surface-0 hover:bg-ink-900/90",
-  },
+// Mapa seguro de clases para tonos (evita clases dinámicas purgadas por Tailwind)
+const toneClasses = {
   blue: {
-    bg: "from-tone-blue to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-blue/30",
-    accent: "bg-ink-900 text-surface-0 hover:bg-ink-900/90",
-  },
-  secondary: {
-    bg: "from-tone-muted to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-muted/30",
-    accent: "bg-ink-900 text-surface-0 hover:bg-ink-900/90",
-  },
-  success: {
-    bg: "from-tone-green to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-green/30",
-    accent: "bg-tone-green text-white hover:bg-tone-green/90",
-  },
-  warning: {
-    bg: "from-tone-sun to-ink-900",
-    text: "text-ink-900",
-    ring: "ring-tone-sun/30",
-    accent: "bg-tone-sun text-ink-900 hover:bg-tone-sun/90",
-  },
-  info: {
-    bg: "from-tone-teal to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-teal/30",
-    accent: "bg-tone-teal text-white hover:bg-tone-teal/90",
-  },
-  neutral: {
-    bg: "from-surface-50 to-ink-900",
-    text: "text-white",
-    ring: "ring-ink-500/30",
-    accent: "bg-ink-900 text-surface-0 hover:bg-ink-900/90",
-  },
-  brand: {
-    bg: "from-brand-500 to-ink-900",
-    text: "text-white",
-    ring: "ring-brand-500/30",
-    accent: "bg-brand-600 text-white hover:bg-brand-600/90",
+    text: 'text-tone-blue-500',
+    bg: 'bg-tone-blue-500',
+    fill: 'fill-tone-blue-500',
+    stroke: 'stroke-tone-blue-500',
   },
   teal: {
-    bg: "from-tone-teal to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-teal/30",
-    accent: "bg-tone-teal text-white hover:bg-tone-teal/90",
+    text: 'text-tone-teal-500',
+    bg: 'bg-tone-teal-500',
+    fill: 'fill-tone-teal-500',
+    stroke: 'stroke-tone-teal-500',
   },
   green: {
-    bg: "from-tone-green to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-green/30",
-    accent: "bg-tone-green text-white hover:bg-tone-green/90",
+    text: 'text-tone-green-500',
+    bg: 'bg-tone-green-500',
+    fill: 'fill-tone-green-500',
+    stroke: 'stroke-tone-green-500',
   },
   violet: {
-    bg: "from-tone-violet to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-violet/30",
-    accent: "bg-ink-900 text-surface-0 hover:bg-ink-900/90",
+    text: 'text-tone-violet-500',
+    bg: 'bg-tone-violet-500',
+    fill: 'fill-tone-violet-500',
+    stroke: 'stroke-tone-violet-500',
   },
   coral: {
-    bg: "from-tone-coral to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-coral/30",
-    accent: "bg-tone-coral text-white hover:bg-tone-coral/90",
+    text: 'text-tone-coral-500',
+    bg: 'bg-tone-coral-500',
+    fill: 'fill-tone-coral-500',
+    stroke: 'stroke-tone-coral-500',
   },
   sun: {
-    bg: "from-tone-sun to-ink-900",
-    text: "text-ink-900",
-    ring: "ring-tone-sun/30",
-    accent: "bg-tone-sun text-ink-900 hover:bg-tone-sun/90",
+    text: 'text-tone-sun-500',
+    bg: 'bg-tone-sun-500',
+    fill: 'fill-tone-sun-500',
+    stroke: 'stroke-tone-sun-500',
   },
   warm: {
-    bg: "from-tone-warm to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-warm/30",
-    accent: "bg-tone-warm text-white hover:bg-tone-warm/90",
+    text: 'text-tone-warm-500',
+    bg: 'bg-tone-warm-500',
+    fill: 'fill-tone-warm-500',
+    stroke: 'stroke-tone-warm-500',
   },
   muted: {
-    bg: "from-tone-muted to-ink-900",
-    text: "text-white",
-    ring: "ring-tone-muted/30",
-    accent: "bg-ink-900 text-surface-0 hover:bg-ink-900/90",
+    text: 'text-tone-muted-500',
+    bg: 'bg-tone-muted-500',
+    fill: 'fill-tone-muted-500',
+    stroke: 'stroke-tone-muted-500',
   },
+} as const;
+
+type ToneKey = keyof typeof toneClasses;
+
+const getTone = (key?: string) => {
+  const fallback: ToneKey = 'green';
+  if (!key) return toneClasses[fallback];
+  const k = key as ToneKey;
+  return toneClasses[k] ?? toneClasses[fallback];
 };
 
-function toneToClasses(tone: HeroSlide["tone"]) {
-  if (!tone) return tonePresets.indigo;
-  if (typeof tone === "string") return tonePresets[tone] ?? tonePresets.indigo;
-  return {
-    bg: tone.bg ?? tonePresets.indigo.bg,
-    text: tone.text ?? tonePresets.indigo.text,
-    ring: tone.ring ?? tonePresets.indigo.ring,
-    accent: tone.accent ?? tonePresets.indigo.accent,
-  };
-}
-
-function toneToShapes(tone: HeroSlide["tone"]) {
-  const map: Record<Extract<HeroSlide["tone"], string>, string[]> = {
-    indigo: [
-      "from-tone-blue/35 to-tone-blue/15",
-      "from-tone-blue/30 to-tone-blue/10",
-      "from-tone-blue/25 to-tone-blue/10",
-    ],
-    blue: [
-      "from-tone-blue/35 to-tone-blue/15",
-      "from-tone-blue/30 to-tone-blue/10",
-      "from-tone-blue/25 to-tone-blue/10",
-    ],
-    secondary: [
-      "from-tone-muted/30 to-tone-muted/10",
-      "from-tone-muted/25 to-tone-muted/10",
-      "from-tone-muted/20 to-tone-muted/5",
-    ],
-    success: [
-      "from-tone-green/30 to-tone-green/10",
-      "from-tone-green/25 to-tone-green/10",
-      "from-tone-green/20 to-tone-green/5",
-    ],
-    warning: [
-      "from-tone-sun/35 to-tone-warm/15",
-      "from-tone-sun/30 to-tone-warm/10",
-      "from-tone-sun/25 to-tone-warm/10",
-    ],
-    info: [
-      "from-tone-teal/35 to-tone-teal/15",
-      "from-tone-teal/30 to-tone-teal/10",
-      "from-tone-teal/25 to-tone-teal/10",
-    ],
-    neutral: [
-      "from-surface-50/60 to-surface-0/0",
-      "from-surface-50/40 to-surface-0/0",
-      "from-surface-50/30 to-surface-0/0",
-    ],
-    brand: [
-      "from-brand-500/35 to-brand-500/15",
-      "from-brand-500/30 to-brand-500/10",
-      "from-brand-500/25 to-brand-500/10",
-    ],
-    teal: [
-      "from-tone-teal/35 to-tone-teal/15",
-      "from-tone-teal/30 to-tone-teal/10",
-      "from-tone-teal/25 to-tone-teal/10",
-    ],
-    green: [
-      "from-tone-green/35 to-tone-green/15",
-      "from-tone-green/30 to-tone-green/10",
-      "from-tone-green/25 to-tone-green/10",
-    ],
-    violet: [
-      "from-tone-violet/35 to-tone-violet/15",
-      "from-tone-violet/30 to-tone-violet/10",
-      "from-tone-violet/25 to-tone-violet/10",
-    ],
-    coral: [
-      "from-tone-coral/35 to-tone-warm/15",
-      "from-tone-coral/30 to-tone-warm/10",
-      "from-tone-coral/25 to-tone-warm/10",
-    ],
-    sun: [
-      "from-tone-sun/35 to-tone-warm/15",
-      "from-tone-sun/30 to-tone-warm/10",
-      "from-tone-sun/25 to-tone-warm/10",
-    ],
-    warm: [
-      "from-tone-warm/35 to-tone-coral/15",
-      "from-tone-warm/30 to-tone-coral/10",
-      "from-tone-warm/25 to-tone-coral/10",
-    ],
-    muted: [
-      "from-tone-muted/30 to-tone-muted/10",
-      "from-tone-muted/25 to-tone-muted/10",
-      "from-tone-muted/20 to-tone-muted/5",
-    ],
-  };
-  if (tone && typeof tone !== "string" && tone.shapes?.length) return tone.shapes;
-  if (!tone) return map.indigo;
-  if (typeof tone === "string") return map[tone] ?? map.indigo;
-  return map.indigo;
-}
-
-function usePrefersReducedMotion(forced?: boolean) {
-  const [prefers, setPrefers] = useState(!!forced);
-  useEffect(() => {
-    if (typeof forced === "boolean") {
-      setPrefers(forced);
-      return;
-    }
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setPrefers(mq.matches);
-    onChange();
-    mq.addEventListener?.("change", onChange);
-    return () => mq.removeEventListener?.("change", onChange);
-  }, [forced]);
-  return prefers;
-}
-
-function aspectHeights(aspect: NonNullable<HeroSliderProps["aspect"]>) {
-  switch (aspect) {
-    case "compact":
-      // Add min-height fallbacks to avoid tiny heroes on short viewports
-      return "min-h-[280px] sm:min-h-[320px] md:min-h-[280px] h-[22svh] sm:h-[32svh] md:h-[30svh] lg:h-[36svh]";
-    case "wide":
-      return "min-h-[420px] sm:min-h-[480px] md:min-h-[520px] h-[50svh] md:h-[58svh] lg:h-[64svh]";
-    case "tall":
-      return "min-h-[560px] sm:min-h-[640px] md:min-h-[700px] h-[70svh] md:h-[78svh] lg:h-[84svh]";
-    default:
-      // standard
-      return "min-h-[440px] sm:min-h-[520px] md:min-h-[560px] h-[56svh] md:h-[64svh] lg:h-[72svh]";
-  }
-}
-
-function typographyByAspect(aspect: NonNullable<HeroSliderProps["aspect"]>) {
-  if (aspect === "compact") {
-    return {
-      title: "text-3xl sm:text-4xl lg:text-5xl",
-      desc: "text-sm sm:text-base",
-      titleMargin: "mb-2",
-      descMargin: "mb-4",
-      // Prefer aspect-based sizing for predictability on small screens
-      imageWrap: "relative mx-auto aspect-[4/3] w-full max-w-sm sm:max-w-md md:max-w-lg",
-    } as const;
-  }
-  return {
-    title: "text-4xl md:text-5xl lg:text-6xl",
-    desc: "text-base md:text-lg",
-    titleMargin: "mb-3",
-    descMargin: "mb-6",
-    // Scale image progressively while keeping a stable aspect
-    imageWrap: "relative mx-auto aspect-[4/5] w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl",
-  } as const;
-}
-
-function DecorativeShapes({ side, shapes }: { side: "left" | "right" | "full"; shapes: string[] }) {
-  const base = "hidden sm:block pointer-events-none absolute inset-0 mix-blend-multiply";
-  const mask = side === "full" ? "" : side === "left" ? "[mask-image:linear-gradient(to_right,black,65%,transparent)]" : "[mask-image:linear-gradient(to_left,black,65%,transparent)]";
+// Componente de formas decorativas
+const DecorativeShapes: React.FC<{ toneKey?: string }> = ({ toneKey }) => {
+  const tone = getTone(toneKey);
   return (
-    <div className={cn(base, mask)} aria-hidden>
-      <div className={cn("absolute -left-16 top-[-12%] h-[150%] w-24 rotate-6 bg-gradient-to-b", shapes[0])} />
-      <div className={cn("absolute left-6 top-[-10%] h-[150%] w-28 -rotate-3 bg-gradient-to-b", shapes[1])} />
-      <div className={cn("absolute left-32 top-[-8%] h-[150%] w-24 rotate-12 bg-gradient-to-b", shapes[2])} />
-      <div
-        className={cn(
-          "absolute left-[-8%] top-8 h-56 w-72 bg-gradient-to-br opacity-70",
-          shapes[1],
-          "[clip-path:polygon(0%_0%,70%_0%,100%_50%,30%_100%,0%_100%)]"
-        )}
-      />
-      <div className="absolute left-0 top-0 h-full w-2/5 bg-gradient-to-r from-white/10 to-transparent" />
+  <>
+    {/* Triángulo superior izquierdo */}
+    <div className="absolute top-10 left-6 md:left-10 animate-float">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L2 20h20L12 2z" className={`${tone.stroke}`} strokeWidth="2" fill="none" />
+      </svg>
     </div>
+    
+    {/* Cruz superior */}
+    <div className="absolute top-8 left-1/3 animate-pulse">
+      <svg width="16" height="16" viewBox="0 0 20 20">
+        <path d="M10 0v20M0 10h20" className={`${tone.stroke} ${tone.fill}`} strokeWidth="2" />
+      </svg>
+    </div>
+    
+    {/* Círculo decorativo derecho */}
+    <div className="absolute top-1/4 right-10 md:right-20 animate-float-delayed">
+      <svg width="14" height="14" viewBox="0 0 16 16" className={`opacity-50 ${tone.fill}`}>
+        <circle cx="8" cy="8" r="8" />
+      </svg>
+    </div>
+    
+    {/* Espiral decorativa */}
+    <div className="absolute bottom-10 left-10 md:left-20 animate-spin-slow">
+      <svg width="24" height="24" viewBox="0 0 30 30" fill="none">
+        <path 
+          d="M15 15c0-5.5 4.5-10 10-10" 
+          className={tone.stroke}
+          strokeWidth="2" 
+          strokeLinecap="round"
+          opacity="0.6"
+        />
+      </svg>
+    </div>
+    
+    {/* Puntos decorativos */}
+    <div className="absolute top-1/3 right-1/3 hidden lg:block">
+      <div className="grid grid-cols-3 gap-1">
+        {[...Array(9)].map((_, i) => (
+          <div 
+            key={i} 
+            className={`w-1.5 h-1.5 rounded-full opacity-20 ${tone.bg}`}
+          />
+        ))}
+      </div>
+    </div>
+    
+    {/* Círculo grande de fondo */}
+    <div 
+      className={`absolute -right-10 top-1/2 -translate-y-1/2 w-64 h-64 md:w-80 md:h-80 rounded-full opacity-10 ${tone.bg}`}
+    />
+  </>
   );
-}
+};
 
-export function HeroSlider({
-  slides,
-  className,
-  aspect = "compact",
-  layout = "split",
-  contentPlacement = "left",
-  overlay = true,
-  autoPlay = true,
-  intervalMs = 6000,
-  pauseOnHover = true,
-  reduceMotion,
-  showIndicators = true,
-  showArrows = true,
-  imageFit = "contain",
-  hideImageOnMobile = true,
-  hideArrowsOnMobile = true,
-  bottomContent,
-}: HeroSliderProps) {
-  const [index, setIndex] = useState(0);
-  const count = slides.length;
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const hovering = useRef(false);
+export const HeroSlider: React.FC<HeroSliderProps> = ({ 
+  slides, 
+  autoPlayInterval = 8000,
+  enableAutoPlay = true 
+}) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(enableAutoPlay);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const current = slides[index] ?? null;
-  const tone = useMemo(() => toneToClasses(current?.tone), [current?.tone]);
-  const shapes = useMemo(() => toneToShapes(current?.tone), [current?.tone]);
-  const prefersRM = usePrefersReducedMotion(reduceMotion);
-  const typo = useMemo(() => typographyByAspect(aspect), [aspect]);
-  
+  // Navegación de slides
+  const goToSlide = useCallback((index: number) => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentSlide(index);
+    setTimeout(() => setIsTransitioning(false), 500);
+  }, [isTransitioning]);
 
-  const goTo = useCallback(
-    (next: number) => setIndex(((next % count) + count) % count),
-    [count]
-  );
-  const next = useCallback(() => goTo(index + 1), [index, goTo]);
-  const prev = useCallback(() => goTo(index - 1), [index, goTo]);
+  const nextSlide = useCallback(() => {
+    goToSlide((currentSlide + 1) % slides.length);
+  }, [currentSlide, slides.length, goToSlide]);
 
-  // autoplay (sin barra de progreso)
+  const prevSlide = useCallback(() => {
+    goToSlide((currentSlide - 1 + slides.length) % slides.length);
+  }, [currentSlide, slides.length, goToSlide]);
+
+  // Auto-play
   useEffect(() => {
-    if (!autoPlay || count <= 1 || prefersRM) return;
-    if (pauseOnHover && hovering.current) return;
+    if (!isAutoPlaying || slides.length <= 1) return;
+    
+    const interval = setInterval(nextSlide, autoPlayInterval);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, nextSlide, autoPlayInterval, slides.length]);
 
-    if (timerRef.current) clearInterval(timerRef.current);
-    const duration = Math.max(2500, intervalMs);
-    timerRef.current = setInterval(next, duration);
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [autoPlay, intervalMs, next, count, pauseOnHover, prefersRM, index]);
+  if (!slides || slides.length === 0) {
+    return <div className="h-96 flex items-center justify-center bg-gray-50">No slides provided</div>;
+  }
 
-  // hover pause
-  useEffect(() => {
-    if (!pauseOnHover) return;
-    const el = containerRef.current;
-    if (!el) return;
-    const onEnter = () => {
-      hovering.current = true;
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-    const onLeave = () => {
-      hovering.current = false;
-      if (autoPlay && count > 1 && !prefersRM) {
-        const duration = Math.max(2500, intervalMs);
-        timerRef.current = setInterval(next, duration);
-      }
-    };
-    el.addEventListener("mouseenter", onEnter);
-    el.addEventListener("mouseleave", onLeave);
-    return () => {
-      el.removeEventListener("mouseenter", onEnter);
-      el.removeEventListener("mouseleave", onLeave);
-    };
-  }, [pauseOnHover, autoPlay, count, prefersRM, intervalMs, next]);
-
-  if (!count) return null;
-
-  const handleKey = useCallback(
-    (e: React.KeyboardEvent<HTMLElement>) => {
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        prev();
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        next();
-      }
-    },
-    [next, prev]
-  );
-
-  const heights = useMemo(() => aspectHeights(aspect), [aspect]);
+  const currentData = slides[currentSlide];
+  const tone = getTone(currentData.tone);
 
   return (
-    <section
-      ref={containerRef}
-      className={cn("relative w-full isolate overflow-hidden bg-white", heights, className)}
-      aria-roledescription="carousel"
-      aria-label="Hero announcements"
-      tabIndex={0}
-      onKeyDown={handleKey}
-    >
-      {/* Progress bar removed per request */}
-
-      {layout === "overlay" ? (
-        <div className="absolute inset-0">
-          {/* Cross-fade background images */}
-          {slides.map((s, i) => (
-            <div
-              key={s.id ?? i}
-              className={cn(
-                "absolute inset-0 transition-opacity duration-500 ease-out",
-                i === index ? "opacity-100" : "opacity-0"
+    <section className="relative overflow-hidden">
+      {/* Altura estándar: 500px en desktop, 600px en mobile para acomodar el contenido */}
+      <div className="relative h-[400px] md:h-[500px] lg:h-[450px]">
+        {/* Formas decorativas */}
+        <DecorativeShapes toneKey={currentData.tone} />
+        
+        {/* Contenido principal */}
+        <div className="relative z-10 h-full container mx-auto px-4 sm:px-6 lg:px-12">
+          <div className="h-full grid lg:grid-cols-2 gap-6 lg:gap-12 items-center py-12 md:py-16">
+            
+            {/* Columna izquierda - Contenido */}
+            <div className={`space-y-4 md:space-y-6 transition-all duration-700 ${isTransitioning ? 'opacity-0 translate-x-[-20px]' : 'opacity-100 translate-x-0'}`}>
+              {/* Brand */}
+              {currentData.brand && (
+                <div 
+                  className={`text-xs md:text-sm font-semibold tracking-wider uppercase ${tone.text}`}
+                >
+                  {currentData.brand}
+                </div>
               )}
-            >
-              <Image
-                src={s.image || "/wex_default.png"}
-                alt={s.title}
-                fill
-                sizes="100vw"
-                priority={i === 0}
-                className="object-cover"
-              />
-            </div>
-          ))}
-          {overlay && (
-            <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/10" />
-          )}
-          {!prefersRM && <DecorativeShapes side={"full"} shapes={shapes} />}
-        </div>
-      ) : (
-        <div className="absolute inset-0">
-          <div className="absolute right-[-6rem] top-[-6rem] h-80 w-80 rounded-[40%] bg-gradient-to-br from-orange-50 to-rose-100" />
-          {!prefersRM && <DecorativeShapes side={contentPlacement} shapes={shapes} />}
-        </div>
-      )}
-
-      {/* Content */}
-      {layout === "split" ? (
-        <div className={cn("relative z-10 mx-auto grid h-full w-full max-w-7xl grid-cols-1 items-center gap-6 sm:gap-8 lg:gap-12 px-6 md:grid-cols-2 md:px-10 lg:px-16")}>
-          {/* Left content */}
-          <div className={cn("h-full flex items-center", contentPlacement === "left" ? "order-1" : "order-2")}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="relative max-w-2xl"
-              >
-                {current?.badge && (
-                  <span
-                    className={cn(
-                      "inline-block mb-3 rounded-full px-3.5 py-1 text-[11px] font-semibold ring-1 ring-inset",
-                      "bg-white text-neutral-900",
-                      tone.ring
+              
+              {/* Título */}
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 leading-tight">
+                {currentData.title.split(' ').map((word, i) => (
+                  <span key={i}>
+                    {i === 2 || i === 5 ? (
+                      <span className={tone.text}>{word} </span>
+                    ) : (
+                      <span>{word} </span>
                     )}
-                  >
-                    {current.badge}
                   </span>
-                )}
-                <h1 className={cn(typo.title, "font-bold tracking-tight leading-tight", typo.titleMargin, "text-neutral-900")}>
-                  {current?.title}
-                </h1>
-                {current?.description && (
-                  <p className={cn(typo.desc, typo.descMargin, "text-neutral-600 leading-relaxed")}>
-                    {current.description}
-                  </p>
-                )}
-                {current?.cta && <CtaButton cta={current.cta} classes={tone.accent} />}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Right image */}
-          <div
-            className={cn(
-              "relative h-full items-center",
-              // Hide the image on small screens if requested
-              hideImageOnMobile ? "hidden sm:flex" : "flex",
-              contentPlacement === "left" ? "order-2" : "order-1"
-            )}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={index}
-                className={typo.imageWrap}
-                initial={{ opacity: 0, scale: 1.02, x: 16 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.98, x: -16 }}
-                transition={{ duration: 0.45, ease: "easeOut" }}
-              >
-                <Image
-                  src={current?.image || "/wex_default.png"}
-                  alt={current?.title || "Hero image"}
-                  fill
-                  sizes="(min-width: 1280px) 560px, (min-width: 1024px) 480px, (min-width: 640px) 50vw, 90vw"
-                  // Only preload when the image column is visible on initial viewport
-                  // to avoid browser warnings about unused preloads on mobile.
-                  priority={!hideImageOnMobile && index === 0}
-                  // Prefer contain on mobile to avoid awkward crops
-                  className={cn(
-                    imageFit === "cover"
-                      ? "object-contain sm:object-cover"
-                      : "object-contain"
-                  )}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-      ) : (
-        <div
-          className={cn(
-            "relative z-10 mx-auto flex h-full w-full max-w-7xl items-center px-6 md:px-10 lg:px-16",
-            contentPlacement === "left" ? "justify-start" : "justify-end"
-          )}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={index}
-              className="relative max-w-2xl"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            >
-              <div className={cn("relative overflow-hidden rounded-2xl p-5 sm:p-6 md:p-8", tone.text)}>
-                <div
-                  className={cn(
-                    "absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br",
-                    tonePresets.indigo.bg,
-                    tone.text
-                  )}
-                  aria-hidden
-                />
-                <div
-                  className={cn(
-                    "absolute inset-0 -z-10 rounded-2xl bg-gradient-to-r",
-                    tonePresets.indigo.bg
-                  )}
-                  aria-hidden
-                />
-                <div
-                  className="pointer-events-none absolute inset-0 rounded-2xl opacity-[0.08]"
-                  style={{
-                    backgroundImage: "radial-gradient(currentColor 1px, transparent 1px)",
-                    backgroundSize: "12px 12px",
-                    color: "#0f172a",
-                  }}
-                  aria-hidden
-                />
-                {current?.badge && (
-                  <span
-                    className={cn(
-                      "relative inline-block mb-3 rounded-full px-3.5 py-1 text-[11px] font-semibold ring-1 ring-inset",
-                      "bg-white text-neutral-900",
-                      tone.ring
-                    )}
-                  >
-                    {current.badge}
-                  </span>
-                )}
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-3">
-                  {current?.title}
-                </h1>
-                {current?.description && (
-                  <p className="text-sm md:text-base lg:text-lg mb-6 text-neutral-700 leading-relaxed">
-                    {current.description}
-                  </p>
-                )}
-                {current?.cta && <CtaButton cta={current.cta} classes={tone.accent} />}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      )}
-
-      {/* Controls */}
-      {count > 1 && (
-        <>
-          {showArrows && (
-            <>
-              <button
-                type="button"
-                aria-label="Previous slide"
-                onClick={prev}
-                className={cn(
-                  "z-30 absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 items-center justify-center rounded-full p-2.5 sm:p-3 shadow-md ring-1 ring-black/10 bg-white/85 text-neutral-900 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/30 backdrop-blur-sm",
-                  hideArrowsOnMobile ? "hidden sm:inline-flex" : "inline-flex"
-                )}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                aria-label="Next slide"
-                onClick={next}
-                className={cn(
-                  "z-30 absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 items-center justify-center rounded-full p-2.5 sm:p-3 shadow-md ring-1 ring-black/10 bg-white/85 text-neutral-900 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/30 backdrop-blur-sm",
-                  hideArrowsOnMobile ? "hidden sm:inline-flex" : "inline-flex"
-                )}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </>
-          )}
-
-          {showIndicators && (
-            <div className="z-30 absolute bottom-3 sm:bottom-4 inset-x-0 flex flex-col items-center gap-2 px-6">
-              <div className="flex items-center justify-center gap-2">
-                {slides.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setIndex(i)}
-                    aria-label={`Go to slide ${i + 1}`}
-                    aria-current={i === index ? "true" : undefined}
-                    className={cn(
-                      "h-2.5 w-2.5 sm:h-2 sm:w-2 rounded-full border border-black/20 transition-all",
-                      i === index ? "bg-neutral-900" : "bg-neutral-400 hover:bg-neutral-500"
-                    )}
-                  />
                 ))}
+              </h1>
+              
+              {/* Descripción */}
+              <p className="text-sm md:text-base lg:text-lg text-gray-600 max-w-lg">
+                {currentData.description}
+              </p>
+              
+              {/* CTAs */}
+              <div className="flex flex-wrap gap-3 items-center pt-2">
+                {currentData.cta && (
+                  <a
+                    href={currentData.cta.href}
+                    className={`
+                      px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-all duration-300 
+                      inline-flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1
+                      ${currentData.cta.variant === 'secondary' 
+                        ? 'bg-white text-gray-900 border-2 border-gray-200 hover:border-gray-300' 
+                        : `text-white hover:opacity-90 ${tone.bg}`
+                      }
+                    `}
+                  >
+                    {currentData.cta.label}
+                  </a>
+                )}
+              </div>
+              
+              {/* Indicador "Scroll Down" - Solo en desktop */}
+              <div className="pt-4 hidden md:block">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <span className="text-xs">Scroll Down</span>
+                  <div className="animate-bounce">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10 3v14m0 0l-4-4m4 4l4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
-        </>
-      )}
-
-      {/* Optional bottom content */}
-      {bottomContent && (
-        <div className="absolute inset-x-0 bottom-0 z-20 w-full">
-          {bottomContent}
+            
+            {/* Columna derecha - Imagen */}
+            <div className="relative h-[250px] md:h-[350px] lg:h-full hidden sm:block">
+              <div className={`
+                absolute inset-0 transition-all duration-700
+                ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}
+              `}>
+                {/* Contenedor de imagen con formas */}
+                <div className="relative h-full">
+                  {/* Forma circular de fondo */}
+                  <div 
+                    className={`absolute top-5 right-5 lg:top-10 lg:right-10 w-48 h-48 lg:w-56 lg:h-56 rounded-full opacity-20 ${tone.bg}`}
+                  />
+                  
+                  {/* Imagen principal */}
+                  <div className="relative z-10 h-full flex items-center justify-center">
+                    <img
+                      src={currentData.image}
+                      alt={currentData.title}
+                      className="relative z-10 max-h-full w-auto object-contain rounded-2xl"
+                    />
+                  </div>
+                  
+                  {/* Forma rectangular decorativa */}
+                  <div 
+                    className={`absolute bottom-5 right-0 w-32 h-32 lg:w-40 lg:h-40 rounded-3xl opacity-30 ${tone.bg}`}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+        
+        {/* Controles del slider - Posicionados absolutamente */}
+        {slides.length > 1 && (
+          <div className="absolute bottom-6 left-0 right-0 z-20">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+              <div className="flex items-center justify-between">
+                {/* Indicadores */}
+                <div className="flex gap-2">
+                  {slides.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`
+                        h-1.5 md:h-2 rounded-full transition-all duration-300
+                        ${index === currentSlide ? `w-8 md:w-10 ${tone.bg}` : 'w-1.5 md:w-2 bg-gray-200'}
+                      `}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+                
+                {/* Controles de navegación */}
+                <div className="flex items-center gap-2 md:gap-4">
+                  {/* Auto-play toggle */}
+                  <button
+                    onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+                    className="p-1.5 md:p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    aria-label={isAutoPlaying ? 'Pause autoplay' : 'Start autoplay'}
+                  >
+                    {isAutoPlaying ? (
+                      <PauseCircle size={20} className={tone.text} />
+                    ) : (
+                      <PlayCircle size={20} className={tone.text} />
+                    )}
+                  </button>
+                  
+                  {/* Navegación manual */}
+                  <button
+                    onClick={prevSlide}
+                    className="p-2 md:p-2.5 rounded-full bg-white shadow-md hover:shadow-lg transition-all hover:scale-110"
+                    aria-label="Previous slide"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    className={`p-2 md:p-2.5 rounded-full shadow-md hover:shadow-lg transition-all hover:scale-110 text-white ${tone.bg}`}
+                    aria-label="Next slide"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* CSS para animaciones personalizadas */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes float-delayed {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-float-delayed {
+          animation: float-delayed 4s ease-in-out infinite;
+        }
+        
+        .animate-spin-slow {
+          animation: spin-slow 20s linear infinite;
+        }
+      `}</style>
     </section>
   );
-}
-
-function CtaButton({ cta, classes }: { cta: NonNullable<HeroSlide["cta"]>; classes: string }) {
-  const { label, href, external } = cta;
-  const base = cn(
-    "inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold shadow-lg",
-    "transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98]",
-    classes
-  );
-  return external ? (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={base}>
-      {label}
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <path d="M8 16l8-8M12 8h4v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </a>
-  ) : (
-    <Link href={href} className={base}>
-      {label}
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <path d="M8 16l8-8M12 8h4v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </Link>
-  );
-}
+};
