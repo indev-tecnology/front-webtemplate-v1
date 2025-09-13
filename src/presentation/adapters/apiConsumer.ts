@@ -21,7 +21,9 @@ function withQS(path: string, search?: GetOpts["search"]) {
 
 // 👉 Retorna Promise<T> tipado
 export async function getJSON<T>(path: string, opts: GetOpts = {}): Promise<T> {
-  const url = `${env.NEXT_PUBLIC_BASE_URL}${withQS(path, opts.search)}`;
+  const rel = withQS(path, opts.search);
+  const base = (env.NEXT_PUBLIC_BASE_URL || '').trim();
+  const url = base ? `${base}${rel}` : rel; // permite usar rutas relativas en build/SSR
   const revalidate = opts.revalidate ?? env.NEXT_REVALIDATE_SECONDS;
   const res = await fetch(url, { next: { revalidate, tags: opts.tag ? [opts.tag] : undefined } });
   if (!res.ok) throw new Error(`HTTP_${res.status}`);
@@ -38,6 +40,8 @@ export const apiConsumer = {
   
   events: (p?: { limit?: number; latest?: boolean }) =>
     getJSON<any[]>(`/api/events`, { tag: TAGS.EVENTS, search: { limit: p?.limit, latest: p?.latest ? 1 : undefined } }),
+  recommendations: (p?: { limit?: number }) =>
+    getJSON<any[]>(`/api/recommendations`, { tag: TAGS.RECOMMENDATIONS, search: { limit: p?.limit } }),
 
   attachments: (p?: { category?: string; q?: string; page?: number; pageSize?: number }) =>
     getJSON<{ items: Attachment[]; total: number }>(`/api/attachments`, { tag: TAGS.ATTACHMENTS, search: p }),

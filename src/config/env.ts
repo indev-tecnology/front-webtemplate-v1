@@ -1,7 +1,8 @@
 import { z } from "zod";
 const Env = z.object({
   MONGODB_URI: z.string().url(),
-  NEXT_PUBLIC_BASE_URL: z.string().url(),
+  // Permite vacío para builds locales/SSR con fetch relativo
+  NEXT_PUBLIC_BASE_URL: z.string().url().or(z.literal('')).default(''),
   REVALIDATE_SECRET: z.string().optional(),
   NEXT_REVALIDATE_SECONDS: z.coerce.number().int().positive().default(60),
 });

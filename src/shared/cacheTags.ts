@@ -7,4 +7,5 @@ export const TAGS = {
   SERVICES: "services",
   AGREEMENTS: "agreements",
   FEATURES: "features",
+  RECOMMENDATIONS: "recommendations",
 } as const;
