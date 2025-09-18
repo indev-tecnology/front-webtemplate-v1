@@ -11,15 +11,15 @@ const config: Config = {
         // extra tones for Hero component
         tone: {
           blue: {DEFAULT:"#2563eb", 50:"#eff6ff", 100:"#dbeafe", 200:"#bfdbfe", 500:"#2563eb", 600:"#1d4ed8", 700:"#1e40af" },
-          teal: {DEFAULT: "#0ea5a4" , 50:"#f0fdfa", 100:"#ccfbf1", 200:"#99f6e4", 500:"#0ea5a4", 600:"#089e9c", 700:"#047c7d" },
-          green: {DEFAULT: "#10b981" , 50:"#f0fdf4", 100:"#dcfce7", 200:"#bbf7d0", 500:"#10b981", 600:"#059669", 700:"#047857" },
+          teal: {DEFAULT: "#54BAB9" , 50:"#f0fdfa", 100:"#ccfbf1", 200:"#99f6e4", 500:"#54BAB9", 600:"#14b8a6", 700:"#0d9488" },
+          green: {DEFAULT: "#219C90" , 50:"#f0fdf4", 100:"#dcfce7", 200:"#bbf7d0", 500:"#219C90", 600:"#16a34a", 700:"#15803d" },
           violet: { DEFAULT: "#8b5cf6" , 50:"#f5f3ff", 100:"#ede9fe", 200:"#ddd6fe", 500:"#8b5cf6", 600:"#7c3aed", 700:"#6d28d9" },
           coral: { DEFAULT: "#f43f5e" , 50:"#fff1f2", 100:"#ffe4e6", 200:"#fecdd3", 500:"#f43f5e", 600:"#e11d48", 700:"#be123c" },
-          sun:  { DEFAULT: "#eab308" , 50:"#fffbeb", 100:"#fef3c7", 200:"#fde68a", 500:"#eab308", 600:"#ca8a04", 700:"#a16207" },
+          sun:  { DEFAULT: "#FFC700" , 50:"#fffbeb", 100:"#fef3c7", 200:"#fde68a", 500:"#FFC700", 600:"#ca8a04", 700:"#a16207" } ,
           warm: { DEFAULT: "#f97316" , 50:"#fff7ed", 100:"#ffedd5", 200:"#fed7aa", 500:"#f97316", 600:"#ea580c", 700:"#c2410c" }  ,
-          muted:  { DEFAULT: "#50665fff" , 50:"#f5f7fa", 100:"#e4e8ef", 200:"#cbd2e1", 500:"#50665f", 600:"#394b48", 700:"#273231" }
+          muted:  { DEFAULT: "#8eb8afff" , 50:"#f5f7fa", 100:"#e4e8ed", 200:"#cbd2d9", 500:"#8eb8afff", 600:"#52606d", 700:"#323f4b" }
         },
-        ink: { 900:"#0f172a", 700:"#334155", 500:"#64748b" },
+        ink: { 0:"#1E201E", 50:"#f9faf9", 100:"#f0f1f0", 200:"#d9dcd9", 500:"#1E201E", 600:"#161716", 700:"#0e0f0e" },
         surface: { 0:"#ffffff", 50:"#f8fafc" },
         danger: { 600:"#dc2626" }
       },

@@ -51,7 +51,7 @@ export interface FeatureLinksProps {
   toneSecondary?: ToneKey; // para rosa por defecto
 }
 
-const FeatureLinks: React.FC<FeatureLinksProps> = ({ items = [], tonePrimary = 'violet', toneSecondary = 'coral' }) => {
+const FeatureLinks: React.FC<FeatureLinksProps> = ({ items = [], tonePrimary = 'violet', toneSecondary = tonePrimary }) => {
   // Datos de ejemplo si no se proporcionan items
   const defaultItems = [
     {

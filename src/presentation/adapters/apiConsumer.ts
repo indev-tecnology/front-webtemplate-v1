@@ -32,10 +32,12 @@ export const apiConsumer = {
   nav: () => getJSON<any>(`/api/nav`, { tag: TAGS.NAV }),
   footer: () => getJSON<any>(`/api/footer`, { tag: TAGS.FOOTER }),
 
-  announcements: () => getJSON<Announcement[]>(`/api/announcements`, { tag: TAGS.ANNOUNCEMENTS }),
+  announcements: (p?: { limit?: number; latest?: boolean }) =>
+    getJSON<Announcement[]>(`/api/announcements`, { tag: TAGS.ANNOUNCEMENTS, search: { limit: p?.limit, latest: p?.latest ? 1 : undefined } }),
   announcement: (slug: string) => getJSON<Announcement>(`/api/announcements/${slug}`, { tag: TAGS.ANNOUNCEMENTS }),
   
-  events: () => getJSON<any[]>(`/api/events`, { tag: TAGS.EVENTS }),
+  events: (p?: { limit?: number; latest?: boolean }) =>
+    getJSON<any[]>(`/api/events`, { tag: TAGS.EVENTS, search: { limit: p?.limit, latest: p?.latest ? 1 : undefined } }),
 
   attachments: (p?: { category?: string; q?: string; page?: number; pageSize?: number }) =>
     getJSON<{ items: Attachment[]; total: number }>(`/api/attachments`, { tag: TAGS.ATTACHMENTS, search: p }),

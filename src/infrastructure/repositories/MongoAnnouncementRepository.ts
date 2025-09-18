@@ -42,6 +42,17 @@ export class MongoAnnouncementRepository {
     return docs.map(map);
   }
 
+  async listLatest(limit = 5): Promise<Announcement[]> {
+    const c = await col(COL.ANNS);
+    const docs = await c
+      // Mostrar aunque la fecha sea vieja o esté expirada; sólo respetar visibilidad
+      .find({ visible: { $ne: false } })
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .limit(limit)
+      .toArray();
+    return docs.map(map);
+  }
+
   async getBySlug(slug: string): Promise<Announcement | null> {
     const c = await col(COL.ANNS);
     const d = await c.findOne({ slug });
