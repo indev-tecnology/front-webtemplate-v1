@@ -5,6 +5,7 @@ import type { Service } from "@/domain/entities/Service";
 import type { Agreement } from "@/domain/entities/Agreement";
 import type { Attachment } from "@/domain/entities/Attachment";
 import { Announcement } from "@/domain/entities/Announcement";
+import { Recommendation } from "@/domain/entities/Recommendation";
 
 type GetOpts = {
   tag?: string;
@@ -41,7 +42,7 @@ export const apiConsumer = {
   events: (p?: { limit?: number; latest?: boolean }) =>
     getJSON<any[]>(`/api/events`, { tag: TAGS.EVENTS, search: { limit: p?.limit, latest: p?.latest ? 1 : undefined } }),
   recommendations: (p?: { limit?: number }) =>
-    getJSON<any[]>(`/api/recommendations`, { tag: TAGS.RECOMMENDATIONS, search: { limit: p?.limit } }),
+    getJSON<Recommendation[]>(`/api/recommendations`, { tag: TAGS.RECOMMENDATIONS, search: { limit: p?.limit } }),
 
   attachments: (p?: { category?: string; q?: string; page?: number; pageSize?: number }) =>
     getJSON<{ items: Attachment[]; total: number }>(`/api/attachments`, { tag: TAGS.ATTACHMENTS, search: p }),

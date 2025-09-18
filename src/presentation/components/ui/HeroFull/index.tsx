@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ArrowRight, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 
 type ToneKey =
   | 'blue'
@@ -35,16 +36,8 @@ export interface HeroFullSlide {
   tone?: ToneKey | string;
 }
 
-export interface QuickAccessItem {
-  image?: string;
-  category?: string;
-  label: string;
-  cta?: () => void;
-}
-
 export interface HeroFullProps {
   slides: HeroFullSlide[];
-  quickAccess?: QuickAccessItem[];
   autoSlide?: boolean;
   slideInterval?: number;
   className?: string;
@@ -52,7 +45,6 @@ export interface HeroFullProps {
 
 const HeroFull = ({
   slides = [],
-  quickAccess = [],
   autoSlide = true,
   slideInterval = 5000,
   className = '',
@@ -82,7 +74,14 @@ const HeroFull = ({
       <div className="relative h-[500px] lg:h-[600px] overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img src={current.image} alt={current.title} className="w-full h-full object-cover object-center" />
+          <Image
+            src={current.image}
+            alt={current.title}
+            fill
+            priority
+            sizes="(min-width: 1280px) 1280px, 100vw"
+            className="object-cover object-center"
+          />
           {/* Neutral overlay + tone accents */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/25 to-transparent" />
         </div>
@@ -130,27 +129,6 @@ const HeroFull = ({
             )}
           </div>
 
-          {/* Right side - Quick Access */}
-          <div className="hidden lg:flex flex-col justify-center space-y-4 pr-8 w-80">
-            {quickAccess.slice(0, 4).map((item, index) => (
-              <button
-                key={index}
-                onClick={() => item.cta && item.cta()}
-                className="bg-white/95 backdrop-blur-sm hover:bg-white rounded-2xl p-4 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-4 group"
-              >
-                {item.image && (
-                  <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <img src={item.image} alt="" className="w-8 h-8" />
-                  </div>
-                )}
-                <div className="flex-1 text-left">
-                  {item.category && <div className="font-semibold text-gray-800 text-sm">{item.category}</div>}
-                  <div className="font-bold text-gray-900 text-lg">{item.label}</div>
-                </div>
-                <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Controls + Indicators (bottom, non-overlapping text) */}
@@ -187,51 +165,6 @@ const HeroFull = ({
           </div>
         )}
       </div>
-
-      {/* Mobile Quick Access */}
-      {quickAccess.length > 0 && (
-        <div className="lg:hidden bg-gray-50 p-4">
-          <div className="grid grid-cols-2 gap-3">
-            {quickAccess.slice(0, 4).map((item, index) => (
-              <button
-                key={index}
-                onClick={() => item.cta && item.cta()}
-                className="bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded-xl p-3 transition-all duration-200 flex items-center space-x-3 group"
-              >
-                {item.image && (
-                  <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <img src={item.image} alt="" className="w-5 h-5" />
-                  </div>
-                )}
-                <div className="flex-1 text-left">
-                  {item.category && <div className="text-xs text-gray-500">{item.category}</div>}
-                  <div className="font-semibold text-gray-800 text-sm">{item.label}</div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Additional Quick Access */}
-      {quickAccess.length > 4 && (
-        <div className="border-t border-gray-200 bg-white px-6 py-4">
-          <div className="flex flex-wrap gap-3 justify-center">
-            {quickAccess.slice(4).map((item, index) => (
-              <button
-                key={index + 4}
-                onClick={() => item.cta && item.cta()}
-                className="inline-flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 group"
-              >
-                {item.image && <img src={item.image} alt="" className="w-4 h-4 mr-2" />}
-                {item.label}
-                <ExternalLink className="ml-1 w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

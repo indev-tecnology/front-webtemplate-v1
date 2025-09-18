@@ -4,10 +4,12 @@ import {Section} from "@/presentation/components/ui/SectionPage";
 import { Announcement } from "@/domain/entities/Announcement";
 import MosaicCards, {NewsItem, SectionData} from "@/presentation/components/ui/CardMosaic";
 import EventsPanel from "@/presentation/components/ui/EventsPanel";
-import TimeLine, { TimeLineItem } from "@/presentation/components/ui/TimeLine";
+import {TimeLine, TimeLineSchema} from "@/presentation/components/ui/TimeLine";
 import { formatRelativeEs } from "@/presentation/components/ui/CardMosaic";
 import HeroFull, {HeroFullSlide} from "@/presentation/components/ui/HeroFull";
 import FeaturesLinks from "@/presentation/components/ui/FeaturesLinks";
+import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
+import { Recommendation } from "@/domain/entities/Recommendation";
 // Información clave
 function InfoClave() {
   return (
@@ -30,41 +32,30 @@ function InfoClave() {
   );
 }
 
-  const quickAccessItems = [
-    {
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=32&h=32&fit=crop",
-      label: "Analytics"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=32&h=32&fit=crop",
-      label: "Proyectos",
-    },
-    {
-      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=32&h=32&fit=crop",
-      label: "Equipo",
-    },
-    {
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=32&h=32&fit=crop",
-      label: "Contacto",
+const recommendations:any = [
+  {
+    image: "/images/tip1.jpg",
+    title: "Optimize Your Workflow",
+    description: "Learn how to improve your daily productivity with these simple steps.",
+    tone: "coral",
+    cta: {
+      label: "Learn More",
+      href: "/tips/workflow"
     }
-  ];
-
-
-async function dataRecommendations(raw: any[]): Promise<TimeLineItem[]> {
-  return raw.map((r: any) => ({
-    id: r.id,
-    title: r.title,
-    description: r.description,
-    badge: r.badge || r.tags?.[0],
-    cta: r.cta || { label: 'Ver más', href: '#' },
-    dateLabel: r.dateLabel || (r.publishedAt ? formatRelativeEs(r.publishedAt) : undefined),
-    tone: r.tone || undefined,
-    imageUrl: r.image,
-    kind: r.kind || 'info',
-  }));
-}
-
-
+  },
+  {
+    image: "/images/tip2.jpg",
+    title: "Security Best Practices",
+    description: "Keep your application secure with our recommended security measures.",
+    tone: "green",
+    brand: "SecurityFirst",
+    cta: {
+      label: "View Guide",
+      href: "/security"
+    }
+  },
+  // ... more items
+];
 async function dataHero(data:any[]): Promise<HeroFullSlide[]> {
   return data.map( a => ({
     title: a.title,
@@ -111,6 +102,19 @@ async function dataEvents(data: any[]): Promise<NewsItem[]> {
   }));
 }
 
+async function fetchRecomendations(): Promise<TimeLineSchema[]> {
+  const recsRaw: Recommendation[] = await apiConsumer.recommendations({ limit: 4 });
+  const recs: TimeLineSchema[] = recsRaw.map(r => ({
+    image: r.image?.url || '/images/wcs_default.png',
+    title: r.title,
+    description: r.description || '',
+    cta: r.cta ? { label: r.cta.label, href: r.cta.href } : undefined,
+    brand: r.badge || undefined,
+    tone: r.tone as TimeLineSchema['tone'] || undefined,
+  }));
+  return recs;
+}
+
 export default async function Home() {
   const announcements: Announcement[] = await apiConsumer.announcements({ limit: 5, latest: true });
   const items: HeroFullSlide[] = await dataHero(announcements);
@@ -118,19 +122,29 @@ export default async function Home() {
   const cards: NewsItem[] = await dataNews(announcements);
   const eventsRaw: any[] = await apiConsumer.events({ limit: 10, latest: true });
   const eventsItems: NewsItem[] = await dataEvents(eventsRaw);
-  const recsRaw: any[] = await apiConsumer.recommendations({ limit: 6 });
-  const timelineItems: TimeLineItem[] = await dataRecommendations(recsRaw);
+  const itemsRecomendations: TimeLineSchema[] = await fetchRecomendations();
   return (
      <div className="flex flex-col">
       
       <Section id="sectionHero" ariaLabel="Sección de bienvenida" pad="xl" tone="muted">
-        <HeroFull slides={items} quickAccess={quickAccessItems}></HeroFull>
+        <HeroFull slides={items}></HeroFull>
         {/* <HeroSlider slides={items}/> */}
       </Section>
       <Section id="sectionEvents" ariaLabel="Sección sobre features" pad="standard" tone="muted">
+        <SectionHeader className="mb-5" title="Conoce sobre mas" description="Conoce mas sobre nuestros servicios" align="center" tone="warm"/>
         <FeaturesLinks/>
       </Section>
-      <Section id="sectionCards" ariaLabel="Sección de noticias y eventos" pad="standard" >
+      <Section id="sectionInfoClave" ariaLabel="Sección de información clave" pad="standard">
+        <InfoClave/>
+      </Section>
+      <Section id="sectionTimeline" ariaLabel="Sección de recomendaciones" pad="standard" tone="teal">
+        <SectionHeader title="Para tener en cuenta" tone="teal" className="mb-5"/>
+        <TimeLine
+          items={itemsRecomendations}
+        />
+      </Section>
+      <hr />
+      <Section id="sectionCards" ariaLabel="Sección de noticias y eventos" pad="standard">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
             <MosaicCards

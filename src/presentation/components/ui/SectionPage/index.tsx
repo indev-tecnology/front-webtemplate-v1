@@ -7,10 +7,10 @@ type Width = "narrow" | "default" | "wide";
 const toneMap: Record<Tone, string> = {
   none: "",
   surface: "bg-surface-50",
-  brand: "bg-brand-50",
+  brand: "bg-brand-100",
   blue: "bg-tone-blue-50",
   teal: "bg-tone-teal-50",
-  green: "bg-tone-green-50",
+  green: "bg-tone-green-100",
   violet: "bg-tone-violet-50",
   coral: "bg-tone-coral-50",
   sun: "bg-tone-sun-50",

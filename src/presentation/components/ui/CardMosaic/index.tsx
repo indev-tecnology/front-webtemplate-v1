@@ -283,9 +283,9 @@ const NewsMosaic: React.FC<{ section: SectionData }> = ({ section }) => {
   const others = featuredIndex >= 0 ? sorted.filter((_, idx) => idx !== featuredIndex) : [];
 
   return (
-    <section className="bg-white rounded-md p-3 h-full">
+    <section className="rounded-md p-3 h-full">
       <div className="flex items-center justify-between mb-3">
-        <h2 className={`text-base font-semibold ${colors.section}`}>{section.title}</h2>
+        <h1 className={`text-base font-semibold ${colors.section}`}>{section.title}</h1>
         {section.ctaLabel && (
           <Link href={section.ctaHref || '#'} className={`flex items-center gap-1 text-xs font-medium transition-colors px-2 py-1 rounded ${colors.cta}`}>
             {section.ctaLabel}
