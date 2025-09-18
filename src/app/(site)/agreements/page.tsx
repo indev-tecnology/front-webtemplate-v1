@@ -15,7 +15,7 @@ export default async function Convenios(){
   const items = await getAgreements();
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-8">
-      <SectionHeader title="Convenios" subtitle="Alianzas estratégicas que potencian nuestro impacto." center />
+      <SectionHeader title="Convenios" description="Alianzas estratégicas que potencian nuestro impacto." align="center" />
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((ag:any)=> {
           const active = !ag.endsAt || new Date(ag.endsAt) > new Date();

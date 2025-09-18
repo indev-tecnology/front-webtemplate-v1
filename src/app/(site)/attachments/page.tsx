@@ -26,7 +26,7 @@ export default async function Anexos(
 
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-8">
-      <SectionHeader title="Anexos" subtitle="Descarga de documentos oficiales en PDF." center />
+      <SectionHeader title="Anexos" description="Descarga de documentos oficiales en PDF." align="center" />
 
       <Card>
         <Card.Body className="grid gap-3 sm:grid-cols-3">

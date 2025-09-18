@@ -5,6 +5,7 @@ import type { Service } from "@/domain/entities/Service";
 import type { Agreement } from "@/domain/entities/Agreement";
 import type { Attachment } from "@/domain/entities/Attachment";
 import { Announcement } from "@/domain/entities/Announcement";
+import { Recommendation } from "@/domain/entities/Recommendation";
 
 type GetOpts = {
   tag?: string;
@@ -21,7 +22,9 @@ function withQS(path: string, search?: GetOpts["search"]) {
 
 // 👉 Retorna Promise<T> tipado
 export async function getJSON<T>(path: string, opts: GetOpts = {}): Promise<T> {
-  const url = `${env.NEXT_PUBLIC_BASE_URL}${withQS(path, opts.search)}`;
+  const rel = withQS(path, opts.search);
+  const base = (env.NEXT_PUBLIC_BASE_URL || '').trim();
+  const url = base ? `${base}${rel}` : rel; // permite usar rutas relativas en build/SSR
   const revalidate = opts.revalidate ?? env.NEXT_REVALIDATE_SECONDS;
   const res = await fetch(url, { next: { revalidate, tags: opts.tag ? [opts.tag] : undefined } });
   if (!res.ok) throw new Error(`HTTP_${res.status}`);
@@ -32,10 +35,14 @@ export const apiConsumer = {
   nav: () => getJSON<any>(`/api/nav`, { tag: TAGS.NAV }),
   footer: () => getJSON<any>(`/api/footer`, { tag: TAGS.FOOTER }),
 
-  announcements: () => getJSON<Announcement[]>(`/api/announcements`, { tag: TAGS.ANNOUNCEMENTS }),
+  announcements: (p?: { limit?: number; latest?: boolean }) =>
+    getJSON<Announcement[]>(`/api/announcements`, { tag: TAGS.ANNOUNCEMENTS, search: { limit: p?.limit, latest: p?.latest ? 1 : undefined } }),
   announcement: (slug: string) => getJSON<Announcement>(`/api/announcements/${slug}`, { tag: TAGS.ANNOUNCEMENTS }),
   
-  events: () => getJSON<any[]>(`/api/events`, { tag: TAGS.EVENTS }),
+  events: (p?: { limit?: number; latest?: boolean }) =>
+    getJSON<any[]>(`/api/events`, { tag: TAGS.EVENTS, search: { limit: p?.limit, latest: p?.latest ? 1 : undefined } }),
+  recommendations: (p?: { limit?: number }) =>
+    getJSON<Recommendation[]>(`/api/recommendations`, { tag: TAGS.RECOMMENDATIONS, search: { limit: p?.limit } }),
 
   attachments: (p?: { category?: string; q?: string; page?: number; pageSize?: number }) =>
     getJSON<{ items: Attachment[]; total: number }>(`/api/attachments`, { tag: TAGS.ATTACHMENTS, search: p }),
@@ -45,4 +52,6 @@ export const apiConsumer = {
 
   agreements: () => getJSON<Agreement[]>(`/api/agreements`, { tag: TAGS.AGREEMENTS }),
   agreement: (slug: string) => getJSON<Agreement>(`/api/agreements/${slug}`, { tag: TAGS.AGREEMENTS }),
+
+  features: () => getJSON<any[]>(`/api/features`, { tag: TAGS.FEATURES }),
 };

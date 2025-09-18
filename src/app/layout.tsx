@@ -1,4 +1,7 @@
 import "./globals.css";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
 
 export const metadata = {
   title: "Sitio dinámico",
@@ -7,8 +10,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html>
-      <body className="min-h-dvh flex flex-col">{children}</body>
+    <html lang="es" className={inter.variable}>
+      <body className="min-h-dvh flex flex-col font-sans">{children}</body>
     </html>
   );
 }

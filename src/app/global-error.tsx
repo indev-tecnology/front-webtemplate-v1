@@ -6,9 +6,11 @@ import { RefreshCw, Home } from "lucide-react";
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   const message = error?.message || "Algo salió mal";
   return (
-    <div className="min-h-screen bg-surface-50 flex items-center justify-center p-6">
-      <div className="max-w-3xl w-full bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
-        <div className="grid gap-6 sm:grid-cols-2 items-center">
+    <html lang="es">
+      <body className="min-h-screen bg-surface-50 flex items-center justify-center p-6">
+        <div className="max-w-3xl w-full bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div className="grid gap-6 sm:grid-cols-[1fr_1.2fr] items-center">
+            {/* Ilustración simple con SVG responsivo */}
             <div className="order-last sm:order-first">
               <svg viewBox="0 0 300 220" className="w-full h-auto">
                 <defs>
@@ -30,6 +32,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
                   <rect x="55" y="142" width="90" height="8" rx="4" fill="#cbd5e1" />
                   <rect x="185" y="125" width="60" height="24" rx="12" fill="#e2e8f0" />
                 </g>
+                {/* Carita/estado */}
                 <g transform="translate(115,55)">
                   <circle r="28" fill="#fff" stroke="#e2e8f0" />
                   <circle cx="-10" cy="-2" r="3" fill="#334155" />
@@ -38,6 +41,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
                 </g>
               </svg>
             </div>
+            {/* Contenido */}
             <div className="space-y-3">
               <span className="inline-block text-xs font-semibold tracking-wide text-tone-warm-600 bg-tone-warm-50 px-2 py-1 rounded-full">Error inesperado</span>
               <h1 className="text-2xl sm:text-3xl font-bold text-ink-0">Lo sentimos, ocurrió un problema</h1>
@@ -62,6 +66,8 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
             </div>
           </div>
         </div>
-      </div>
+      </body>
+    </html>
   );
 }
+

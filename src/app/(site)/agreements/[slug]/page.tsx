@@ -21,7 +21,7 @@ export default async function AgreementDetail({ params }: { params: Promise<{ sl
 
   return (
     <div className="mx-auto max-w-5xl p-6 space-y-8">
-      <SectionHeader title={ag.name} subtitle={ag.description} />
+      <SectionHeader title={ag.name} description={ag.description} />
       <Card>
         <Card.Body className="flex items-center gap-6">
           {ag.logo?.url && (

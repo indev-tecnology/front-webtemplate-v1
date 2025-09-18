@@ -18,7 +18,7 @@ export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   density?: "compact" | "comfortable"
 }
 
-export function Card({
+function BaseCard({
   className,
   clickable,
   density = "comfortable",
@@ -37,6 +37,30 @@ export function Card({
   )
 }
 
+// Compound API typings
+export type CardCompound = React.FC<CardProps> & {
+  Media: typeof CardMedia;
+  Header: typeof CardHeader;
+  Body: typeof CardBody;
+  Footer: typeof CardFooter;
+  Badge: typeof CardBadge;
+  Link: typeof CardLink;
+  Skeleton: typeof CardSkeleton;
+};
+
+const CardCompoundImpl = Object.assign(BaseCard as React.FC<CardProps>, {
+  Media: CardMedia,
+  Header: CardHeader,
+  Body: CardBody,
+  Footer: CardFooter,
+  Badge: CardBadge,
+  Link: CardLink,
+  Skeleton: CardSkeleton,
+}) as CardCompound;
+
+export const Card = CardCompoundImpl;
+export default CardCompoundImpl;
+
 export function CardMedia({
   className,
   children,
@@ -49,8 +73,24 @@ export function CardMedia({
   )
 }
 
-export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("p-4", className)} {...props} />
+export function CardHeader({ className, title, subtitle, right, children, ...rest }: React.HTMLAttributes<HTMLDivElement> & { title?: string; subtitle?: string; right?: React.ReactNode }) {
+  if (title || subtitle || right) {
+    return (
+      <div className={cn("p-4 flex items-start justify-between gap-3", className)} {...rest}>
+        <div className="min-w-0">
+          {title && <h3 className="text-base font-semibold text-gray-900 truncate">{title}</h3>}
+          {subtitle && <p className="text-sm text-gray-500 line-clamp-2">{subtitle}</p>}
+          {!title && !subtitle && children}
+        </div>
+        {right && <div className="flex-shrink-0">{right}</div>}
+      </div>
+    );
+  }
+  return (
+    <div className={cn("p-4", className)} {...rest}>
+      {children}
+    </div>
+  );
 }
 
 export function CardBody({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -61,14 +101,20 @@ export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDiv
   return <div className={cn("p-4 pt-0", className)} {...props} />
 }
 
-export function CardBadge({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+export function CardBadge({ className, tone, ...rest }: React.HTMLAttributes<HTMLSpanElement> & { tone?: 'neutral' | 'success' | 'danger' }) {
+  const toneCls = tone === 'success'
+    ? 'bg-green-100 text-green-700'
+    : tone === 'danger'
+      ? 'bg-red-100 text-red-700'
+      : 'bg-gray-100 text-gray-700';
   return (
     <span
       className={cn(
-        "absolute left-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-medium text-gray-800 backdrop-blur",
+        "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium",
+        toneCls,
         className,
       )}
-      {...props}
+      {...rest}
     />
   )
 }

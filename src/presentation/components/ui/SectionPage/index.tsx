@@ -1,25 +1,33 @@
 import { cn } from "@/shared/cn";
 
-type Tone = "none" | "surface" | "muted" | "brand";
-type Pad = "none" | "sm" | "md" | "lg";
+type Tone = "none" | "surface" | "muted" | "brand" | "blue" | "teal" | "green" | "violet" | "coral" | "sun" | "warm" | "muted";
+type Pad = "none" | "sm" | "md" | "xl" | "standard";
 type Width = "narrow" | "default" | "wide";
 
 const toneMap: Record<Tone, string> = {
   none: "",
-  surface: "bg-white",
-  muted: "bg-surface-50",
-  brand: "bg-brand-50",
+  surface: "bg-surface-50",
+  brand: "bg-brand-100",
+  blue: "bg-tone-blue-50",
+  teal: "bg-tone-teal-50",
+  green: "bg-tone-green-100",
+  violet: "bg-tone-violet-50",
+  coral: "bg-tone-coral-50",
+  sun: "bg-tone-sun-50",
+  warm: "bg-tone-warm-50",
+  muted: "bg-tone-muted-50",
 };
 const padMap: Record<Pad, string> = {
   none: "",
-  sm: "py-6",
-  md: "py-10",
-  lg: "py-16",
+  sm: "sm:py-4",
+  md: "md:py-8",
+  xl: "xl:py-8",
+  standard: "px-4 py-8",
 };
 const widthMap: Record<Width, string> = {
   narrow: "max-w-3xl",
-  default: "max-w-6xl",
-  wide: "max-w-7xl",
+  default: "max-w-7xl",
+  wide: "max-w-6xl",
 };
 
 type BaseProps = {
@@ -39,7 +47,7 @@ export function Section({
   id,
   ariaLabel,
   tone = "none",
-  pad = "sm",
+  pad = "none",
   width = "default",
   container = true,
   className,
@@ -47,23 +55,9 @@ export function Section({
 }: BaseProps) {
   return (
     <Tag id={id} aria-label={ariaLabel} className={cn(toneMap[tone], padMap[pad], className)}>
-      <div className={cn(container ? "mx-auto px-6" : "", container && widthMap[width])}>
+      <div className={cn(container ? "mx-auto" : "", container && widthMap[width])}>
         {children}
       </div>
     </Tag>
-  );
-}
-
-// Subcabecera opcional para título + subtítulo
-export function SectionHeader({
-  title,
-  subtitle,
-  center = false,
-}: { title: string; subtitle?: string; center?: boolean }) {
-  return (
-    <header className={cn("space-y-2", center && "text-center")}>
-      <h2 className="text-3xl sm:text-4xl font-bold">{title}</h2>
-      {subtitle && <p className="text-gray-600 max-w-2xl mx-auto">{subtitle}</p>}
-    </header>
   );
 }

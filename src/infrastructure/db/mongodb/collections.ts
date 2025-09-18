@@ -9,4 +9,7 @@ export const COL = {
   ATTS: "attachments",
   SERVICES: "services",
   AGREEMENTS: "agreements",
+  FEATURES: "features",
+  RECS: "recommendations",
+  PAGES: "pages",
 } as const;

@@ -15,7 +15,7 @@ export default async function ServiceDetail({ params }:{ params: Promise<{slug:s
 
   return (
     <div className="mx-auto max-w-5xl p-6 space-y-8">
-      <SectionHeader title={s.name} subtitle={s.description} />
+      <SectionHeader title={s.name} description={s.description} />
       {s.subservices?.length ? (
         <Card>
           <Card.Header title="Subservicios" />

@@ -1,6 +1,5 @@
 import { col, COL } from "@/infrastructure/db/mongodb/collections";
 import type { Announcement } from "@/domain/entities/Announcement";
-import { s } from "framer-motion/client";
 
 const map = (d:any): Announcement => ({
   id: String(d._id),
@@ -37,6 +36,17 @@ export class MongoAnnouncementRepository {
     const docs = await c
       .find(activeFilter())
       .sort({ pinned: -1, priority: -1, publishedAt: -1, createdAt: -1 })
+      .limit(limit)
+      .toArray();
+    return docs.map(map);
+  }
+
+  async listLatest(limit = 5): Promise<Announcement[]> {
+    const c = await col(COL.ANNS);
+    const docs = await c
+      // Mostrar aunque la fecha sea vieja o esté expirada; sólo respetar visibilidad
+      .find({ visible: { $ne: false } })
+      .sort({ publishedAt: -1, createdAt: -1 })
       .limit(limit)
       .toArray();
     return docs.map(map);
