@@ -10,7 +10,7 @@ export default async function Services(){
   const services = await apiConsumer.services();
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-8">
-      <SectionHeader title="Servicios" subtitle="Soluciones diseñadas para impacto y escala." center />
+      <SectionHeader title="Servicios" description="Soluciones diseñadas para impacto y escala." align="center" />
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {services.map((s:any)=>(
           <Card key={s.id}>

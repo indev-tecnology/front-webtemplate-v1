@@ -7,10 +7,10 @@ type Width = "narrow" | "default" | "wide";
 const toneMap: Record<Tone, string> = {
   none: "",
   surface: "bg-surface-50",
-  brand: "bg-brand-50",
+  brand: "bg-brand-100",
   blue: "bg-tone-blue-50",
   teal: "bg-tone-teal-50",
-  green: "bg-tone-green-50",
+  green: "bg-tone-green-100",
   violet: "bg-tone-violet-50",
   coral: "bg-tone-coral-50",
   sun: "bg-tone-sun-50",
@@ -21,8 +21,8 @@ const padMap: Record<Pad, string> = {
   none: "",
   sm: "sm:py-4",
   md: "md:py-8",
-  xl: "xl:py-16",
-  standard: "py-8 md:py-12 md:px-4 sm:px-8",
+  xl: "xl:py-8",
+  standard: "px-4 py-8",
 };
 const widthMap: Record<Width, string> = {
   narrow: "max-w-3xl",
@@ -59,19 +59,5 @@ export function Section({
         {children}
       </div>
     </Tag>
-  );
-}
-
-// Subcabecera opcional para título + subtítulo
-export function SectionHeader({
-  title,
-  subtitle,
-  center = false,
-}: { title: string; subtitle?: string; center?: boolean }) {
-  return (
-    <header className={cn("space-y-2", center && "text-center")}>
-      <h2 className="text-3xl sm:text-4xl font-bold">{title}</h2>
-      {subtitle && <p className="text-gray-600 max-w-2xl mx-auto">{subtitle}</p>}
-    </header>
   );
 }

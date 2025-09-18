@@ -1,14 +1,15 @@
 import { apiConsumer } from "@/presentation/adapters/apiConsumer";
-import TextLink from "@/presentation/components/ui/TextLink";
 import {HeroSlider, SlideData} from "@/presentation/components/ui/Hero";
-import {Section, SectionHeader} from "@/presentation/components/ui/SectionPage";
+import {Section} from "@/presentation/components/ui/SectionPage";
 import { Announcement } from "@/domain/entities/Announcement";
-import Gallery from "@/presentation/components/ui/Gallery";
 import MosaicCards, {NewsItem, SectionData} from "@/presentation/components/ui/CardMosaic";
 import EventsPanel from "@/presentation/components/ui/EventsPanel";
-import FeatureLinks from "@/presentation/components/ui/FeaturesLinks";
-import type { Event } from "@/domain/entities/Event";
-
+import {TimeLine, TimeLineSchema} from "@/presentation/components/ui/TimeLine";
+import { formatRelativeEs } from "@/presentation/components/ui/CardMosaic";
+import HeroFull, {HeroFullSlide} from "@/presentation/components/ui/HeroFull";
+import FeaturesLinks from "@/presentation/components/ui/FeaturesLinks";
+import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
+import { Recommendation } from "@/domain/entities/Recommendation";
 // Información clave
 function InfoClave() {
   return (
@@ -31,15 +32,38 @@ function InfoClave() {
   );
 }
 
-
-async function dataHero(data:any[]): Promise<SlideData[]> {
+const recommendations:any = [
+  {
+    image: "/images/tip1.jpg",
+    title: "Optimize Your Workflow",
+    description: "Learn how to improve your daily productivity with these simple steps.",
+    tone: "coral",
+    cta: {
+      label: "Learn More",
+      href: "/tips/workflow"
+    }
+  },
+  {
+    image: "/images/tip2.jpg",
+    title: "Security Best Practices",
+    description: "Keep your application secure with our recommended security measures.",
+    tone: "green",
+    brand: "SecurityFirst",
+    cta: {
+      label: "View Guide",
+      href: "/security"
+    }
+  },
+  // ... more items
+];
+async function dataHero(data:any[]): Promise<HeroFullSlide[]> {
   return data.map( a => ({
     title: a.title,
     description: a.description,
     image: a.image?.url || '/images/wcs_default.png',
-    cta: a.cta || null,
+    cta: a.cta?.label || null,
     badge: a.tags[0] || null,
-    tone: a.tone,
+    tone:  a.tone || 'brand',
   }));
 }
 
@@ -78,24 +102,49 @@ async function dataEvents(data: any[]): Promise<NewsItem[]> {
   }));
 }
 
+async function fetchRecomendations(): Promise<TimeLineSchema[]> {
+  const recsRaw: Recommendation[] = await apiConsumer.recommendations({ limit: 4 });
+  const recs: TimeLineSchema[] = recsRaw.map(r => ({
+    image: r.image?.url || '/images/wcs_default.png',
+    title: r.title,
+    description: r.description || '',
+    cta: r.cta ? { label: r.cta.label, href: r.cta.href } : undefined,
+    brand: r.badge || undefined,
+    tone: r.tone as TimeLineSchema['tone'] || undefined,
+  }));
+  return recs;
+}
+
 export default async function Home() {
   const announcements: Announcement[] = await apiConsumer.announcements({ limit: 5, latest: true });
-  const items: SlideData[] = await dataHero(announcements);
+  const items: HeroFullSlide[] = await dataHero(announcements);
   const features = await dataFeatures();
   const cards: NewsItem[] = await dataNews(announcements);
   const eventsRaw: any[] = await apiConsumer.events({ limit: 10, latest: true });
   const eventsItems: NewsItem[] = await dataEvents(eventsRaw);
+  const itemsRecomendations: TimeLineSchema[] = await fetchRecomendations();
   return (
      <div className="flex flex-col">
-      <Section id="sectionHero" ariaLabel="Sección de bienvenida" pad="xl" tone="green">
-        <HeroSlider slides={items}/>
+      
+      <Section id="sectionHero" ariaLabel="Sección de bienvenida" pad="xl" tone="muted">
+        <HeroFull slides={items}></HeroFull>
+        {/* <HeroSlider slides={items}/> */}
       </Section>
-      <Section id="sectionEvents" ariaLabel="Sección sobre features" container={false} width="wide">
-        <FeatureLinks items={features} tonePrimary="sun"/>
+      <Section id="sectionEvents" ariaLabel="Sección sobre features" pad="standard" tone="muted">
+        <SectionHeader className="mb-5" title="Conoce sobre mas" description="Conoce mas sobre nuestros servicios" align="center" tone="warm"/>
+        <FeaturesLinks/>
       </Section>
+      <Section id="sectionInfoClave" ariaLabel="Sección de información clave" pad="standard">
+        <InfoClave/>
+      </Section>
+      <Section id="sectionTimeline" ariaLabel="Sección de recomendaciones" pad="standard" tone="teal">
+        <SectionHeader title="Para tener en cuenta" tone="teal" className="mb-5"/>
+        <TimeLine
+          items={itemsRecomendations}
+        />
+      </Section>
+      <hr />
       <Section id="sectionCards" ariaLabel="Sección de noticias y eventos" pad="standard">
-        <SectionHeader title="Novedades y eventos" key={"seccion-novedades"}/>
-        <hr />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
             <MosaicCards
@@ -117,10 +166,6 @@ export default async function Home() {
             />
           </div>
         </div>
-      </Section>
-      {/* Información clave */}
-      <Section id="sectionInfoClave" ariaLabel="Sección de información clave">
-        <InfoClave />
       </Section>
     </div>
   );

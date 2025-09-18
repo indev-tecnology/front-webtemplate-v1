@@ -1,6 +1,5 @@
 import { col, COL } from "@/infrastructure/db/mongodb/collections";
 import type { Announcement } from "@/domain/entities/Announcement";
-import { s } from "framer-motion/client";
 
 const map = (d:any): Announcement => ({
   id: String(d._id),
