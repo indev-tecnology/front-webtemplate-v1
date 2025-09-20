@@ -2,6 +2,8 @@
 import { Button } from "@/presentation/components/ui/Button"; // suponiendo un wrapper
 import { Users, Target, Lightbulb } from "lucide-react";
 
+export const revalidate = 86400;
+
 export default function AboutUsPage() {
   return (
     <div className="flex flex-col">

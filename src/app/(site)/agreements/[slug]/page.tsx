@@ -2,21 +2,19 @@ import Image from "next/image";
 import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
 import { Card } from "@/presentation/components/ui/Card";
 import { fmtCo } from "@/shared/date";
+import { getCachedAgreementBySlug } from "@/application/cached";
 
-async function getAgreement(slug: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/agreements/${slug}`, { next: { revalidate: 120 } });
-  return res.ok ? res.json() : null;
-}
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const ag = await getAgreement(slug);
+  const ag = await getCachedAgreementBySlug(slug);
   return { title: ag?.name || "Convenio" };
 }
 
 export default async function AgreementDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const ag = await getAgreement(slug);
+  const ag = await getCachedAgreementBySlug(slug);
   if (!ag) return <div className="p-8">Convenio no disponible.</div>;
 
   return (
