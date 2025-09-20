@@ -19,10 +19,10 @@ const toneMap: Record<Tone, string> = {
 };
 const padMap: Record<Pad, string> = {
   none: "",
-  sm: "sm:py-4",
-  md: "md:py-8",
-  xl: "xl:py-8",
-  standard: "px-4 py-8",
+  sm: "sm:py-8",
+  md: "md:py-12",
+  xl: "xl:py-12",
+  standard: "px-4 py-16 sm:py-8 md:py-12",
 };
 const widthMap: Record<Width, string> = {
   narrow: "max-w-3xl",

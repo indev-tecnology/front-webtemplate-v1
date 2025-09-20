@@ -113,7 +113,7 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   const alignment = alignClasses[align] || alignClasses.left;
   const toneStyle = tone ? toneVariants[tone] : undefined;
-  const titleClasses = `text-3xl sm:text-4xl font-bold tracking-tight ${toneStyle ? toneStyle.title : 'text-slate-900'}`;
+  const titleClasses = `text-3xl sm:text-4xl font-bold tracking-tight ${toneStyle ? toneStyle.title : 'text-green-600'}`;
   const badgeClasses = toneStyle
     ? `${toneStyle.badgeBg} ${toneStyle.badgeBorder} ${toneStyle.badgeText}`
     : 'border-slate-200/70 bg-white/70 text-slate-600';

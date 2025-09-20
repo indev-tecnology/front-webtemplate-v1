@@ -5,7 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import { apiConsumer } from '@/presentation/adapters/apiConsumer';
 import type { Feature } from '@/domain/entities/Feature';
 import { cn } from '@/shared/cn';
-import type { ToneName } from '@/presentation/components/ui/CardMosaic';
+import type { ToneName } from '@/shared/toneName';
 
 export interface FeaturesLinksProps {
   title?: string;
@@ -39,13 +39,6 @@ function normalizeImage(img: Feature['image'] | string | undefined, alt: string)
 // Server component (async) para SSR y revalidate
 const FeaturesLinks = async ({ title, items, tone = 'brand', className = '', size = 'compact' }: FeaturesLinksProps) => {
   let data: Feature[] = items || [];
-  if (!items) {
-    try {
-      data = await apiConsumer.features();
-    } catch {
-      data = [];
-    }
-  }
 
   return (
     <section className={cn('w-full', className)} aria-label={title || 'Accesos rápidos'}>

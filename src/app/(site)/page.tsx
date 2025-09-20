@@ -1,15 +1,18 @@
 import { apiConsumer } from "@/presentation/adapters/apiConsumer";
-import {HeroSlider, SlideData} from "@/presentation/components/ui/Hero";
 import {Section} from "@/presentation/components/ui/SectionPage";
 import { Announcement } from "@/domain/entities/Announcement";
-import MosaicCards, {NewsItem, SectionData} from "@/presentation/components/ui/CardMosaic";
-import EventsPanel from "@/presentation/components/ui/EventsPanel";
 import {TimeLine, TimeLineSchema} from "@/presentation/components/ui/TimeLine";
-import { formatRelativeEs } from "@/presentation/components/ui/CardMosaic";
 import HeroFull, {HeroFullSlide} from "@/presentation/components/ui/HeroFull";
-import FeaturesLinks from "@/presentation/components/ui/FeaturesLinks";
+import FeaturesLinks, {FeaturesLinksProps} from "@/presentation/components/ui/FeaturesLinks";
 import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
 import { Recommendation } from "@/domain/entities/Recommendation";
+import { TipsMosaic } from "@/presentation/components/ui/TipsMosaic";
+import ContactCard from "@/presentation/components/ui/ContactCard";
+import type { EventItem } from "@/presentation/components/ui/EventsMosaic";
+import EventsSplitView from "@/presentation/components/ui/EventsSplitView";
+import { PillarsCompact, type PillarItem } from "@/presentation/components/ui/PillarsCompact";
+import { Target, Lightbulb, Users } from "lucide-react";
+import { pillarsConfig, homeCopy, contactInfo, type IconKey } from "@/config/siteStatic";
 // Información clave
 function InfoClave() {
   return (
@@ -32,73 +35,15 @@ function InfoClave() {
   );
 }
 
-const recommendations:any = [
-  {
-    image: "/images/tip1.jpg",
-    title: "Optimize Your Workflow",
-    description: "Learn how to improve your daily productivity with these simple steps.",
-    tone: "coral",
-    cta: {
-      label: "Learn More",
-      href: "/tips/workflow"
-    }
-  },
-  {
-    image: "/images/tip2.jpg",
-    title: "Security Best Practices",
-    description: "Keep your application secure with our recommended security measures.",
-    tone: "green",
-    brand: "SecurityFirst",
-    cta: {
-      label: "View Guide",
-      href: "/security"
-    }
-  },
-  // ... more items
-];
+//
 async function dataHero(data:any[]): Promise<HeroFullSlide[]> {
   return data.map( a => ({
     title: a.title,
     description: a.description,
     image: a.image?.url || '/images/wcs_default.png',
-    cta: a.cta?.label || null,
+    cta: a.cta || null,
     badge: a.tags[0] || null,
     tone:  a.tone || 'brand',
-  }));
-}
-
-async function dataFeatures() {
-  return (await apiConsumer.features()).map((e:any) => ({
-    label: e.label,
-    cta: e.cta || '#',
-    image: e.image || '/images/wcs_default.png',
-    brand: e.brand || 'gray',
-  }));
-};
-
-async function dataNews(data:any[]): Promise<NewsItem[]> {
-  return data.map( a => ({
-    id: a.id,
-    title: a.title,
-    description: a.description,
-    imageUrl: a.image?.url || '/images/wcs_default.png',
-    href: a.cta?.href || null,
-    ctaLabel: a.cta?.label || 'Más información',
-    badge: a.tags[0] || null,
-    tone: a.tone || 'brand',
-    publishedAt: a.publishedAt ? new Date(a.publishedAt) : undefined,
-  }));
-}
-
-async function dataEvents(data: any[]): Promise<NewsItem[]> {
-  return data.map((e: any) => ({
-    id: e.id,
-    title: e.title,
-    description: e.description,
-    imageUrl: e.image?.url || '/images/wcs_default.png',
-    startsAt: e.startsAt ? new Date(e.startsAt) : undefined,
-    href: e.slug ? `/eventos/${e.slug}` : undefined,
-    badge: e.location || undefined,
   }));
 }
 
@@ -117,55 +62,67 @@ async function fetchRecomendations(): Promise<TimeLineSchema[]> {
 
 export default async function Home() {
   const announcements: Announcement[] = await apiConsumer.announcements({ limit: 5, latest: true });
-  const items: HeroFullSlide[] = await dataHero(announcements);
-  const features = await dataFeatures();
-  const cards: NewsItem[] = await dataNews(announcements);
+  const heroSlides: HeroFullSlide[] = await dataHero(announcements);
+  const featuresLinks = await apiConsumer.features(); 
   const eventsRaw: any[] = await apiConsumer.events({ limit: 10, latest: true });
-  const eventsItems: NewsItem[] = await dataEvents(eventsRaw);
+  const eventsItems: EventItem[] = (eventsRaw || []).map((e: any) => ({
+    image: e?.image?.url || '/images/wcs_default.png',
+    title: e?.title ?? '',
+    description: e?.description ?? '',
+    date: e?.startsAt,
+    endDate: e?.endsAt,
+    location: e?.location,
+    // cta opcional: activa si tienes página de detalle
+    // cta: { label: 'Ver detalles', href: `/eventos/${e.slug || e.id}` },
+    published: true,
+    featured: false,
+  }));
   const itemsRecomendations: TimeLineSchema[] = await fetchRecomendations();
+  // Mapeo de iconos desde claves declaradas en la config estática
+  const iconMap: Record<IconKey, React.ElementType<{ className?: string }>> = {
+    target: Target,
+    lightbulb: Lightbulb,
+    users: Users,
+  };
+  const pillars: PillarItem[] = pillarsConfig.map((it) => ({
+    title: it.title,
+    description: it.description,
+    tone: it.tone,
+    href: it.href,
+    icon: it.iconKey ? iconMap[it.iconKey] : undefined,
+  }));
   return (
      <div className="flex flex-col">
       
-      <Section id="sectionHero" ariaLabel="Sección de bienvenida" pad="xl" tone="muted">
-        <HeroFull slides={items}></HeroFull>
+      <Section id="sectionHero" ariaLabel="Sección de bienvenida" pad="xl">
+        <HeroFull slides={heroSlides}></HeroFull>
         {/* <HeroSlider slides={items}/> */}
       </Section>
-      <Section id="sectionEvents" ariaLabel="Sección sobre features" pad="standard" tone="muted">
-        <SectionHeader className="mb-5" title="Conoce sobre mas" description="Conoce mas sobre nuestros servicios" align="center" tone="warm"/>
-        <FeaturesLinks/>
+      <Section id="sectionPillars" ariaLabel="Misión y visión" pad="standard" tone="none">
+        <SectionHeader
+          className="mb-6"
+          title={homeCopy.pillars.title}
+          description={homeCopy.pillars.description}
+          align="center"
+          tone="green"
+        />
+        <PillarsCompact items={pillars} columns={3} tone="green" />
+        <FeaturesLinks items={featuresLinks} className="mt-10"/>
       </Section>
-      <Section id="sectionInfoClave" ariaLabel="Sección de información clave" pad="standard">
-        <InfoClave/>
-      </Section>
-      <Section id="sectionTimeline" ariaLabel="Sección de recomendaciones" pad="standard" tone="teal">
-        <SectionHeader title="Para tener en cuenta" tone="teal" className="mb-5"/>
-        <TimeLine
+      {/* Pilares de identidad: fondo con degradado (brand → surface) */}
+      <Section id="sectionTips" ariaLabel="Sección de información de interés" pad="standard" tone="green">
+        <SectionHeader title={homeCopy.tips.title} description={homeCopy.tips.description} badge={homeCopy.tips.badge} />
+        <TipsMosaic
           items={itemsRecomendations}
+          className="mt-10"
         />
       </Section>
-      <hr />
-      <Section id="sectionCards" ariaLabel="Sección de noticias y eventos" pad="standard">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2">
-            <MosaicCards
-              title="Últimas novedades"
-              ctaLabel="Ver más"
-              ctaHref="/noticias"
-              tone="warm"
-              items={cards}
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <EventsPanel
-              title="Próximos eventos"
-              ctaLabel="Ver todos"
-              ctaHref="/eventos"
-              tone="teal"
-              badgeTone="sun"
-              items={eventsItems}
-            />
-          </div>
-        </div>
+      <Section id="sectionEvents" ariaLabel="Eventos y anuncios" pad="standard">
+        <SectionHeader title={homeCopy.events.title} tone="sun" className="mb-5"/>
+        <EventsSplitView items={eventsItems} maxList={6} />
+      </Section>
+      <Section id="sectionContact" ariaLabel="Sección de contacto" pad="standard" tone="muted">
+        <ContactCard title={homeCopy.contact.title} subtitle={homeCopy.contact.subtitle} tone={homeCopy.contact.tone} email={contactInfo.email} phone={contactInfo.phone} />
       </Section>
     </div>
   );

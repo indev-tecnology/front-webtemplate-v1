@@ -31,7 +31,7 @@ export interface HeroFullSlide {
   description: string;
   image: string;
   badge?: string;
-  cta?: string;
+  cta?: {label:string, href:string};
   contact?: string;
   tone?: ToneKey | string;
 }
@@ -67,6 +67,7 @@ const HeroFull = ({
 
   const current = slides[currentSlide];
   const tone = getTone(current.tone as string | undefined);
+  const isFirstSlide = currentSlide === 0;
 
   return (
     <div className={`bg-white overflow-hidden ${className}`}>
@@ -78,7 +79,8 @@ const HeroFull = ({
             src={current.image}
             alt={current.title}
             fill
-            priority
+            priority={isFirstSlide}
+            loading={isFirstSlide ? 'eager' : 'lazy'}
             sizes="(min-width: 1280px) 1280px, 100vw"
             className="object-cover object-center"
           />
@@ -110,8 +112,8 @@ const HeroFull = ({
 
             {current.cta && (
               <div className="mb-4">
-                <a className={`inline-flex items-center px-8 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-white ${tone.bg}`} href="#">
-                  {current.cta}
+                <a className={`inline-flex items-center px-8 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-white ${tone.bg}`} href={`${current.cta.href}`}>
+                  {current.cta.label}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </a>
               </div>
