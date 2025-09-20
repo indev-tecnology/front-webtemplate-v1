@@ -1,6 +1,6 @@
 export function Footer({ data }: { data: any }){
   return (
-    <footer className="border-t mt-8">
+    <footer className="border-t bg-surface-200 text-neutral-700">
       <div className="mx-auto max-w-6xl p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {data?.columns?.map((col:any, i:number)=> (
           <div key={i}>

@@ -233,7 +233,7 @@ export function Navbar({ data, searchSlot }: { data: Navigation; searchSlot?: Re
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-token-border bg-surface/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-token-border bg-surface/50 backdrop-blur">
       <div className="container grid h-16 grid-cols-[auto_1fr_auto] items-center gap-3">
         {/* Left: Brand */}
         <div className="flex items-center">

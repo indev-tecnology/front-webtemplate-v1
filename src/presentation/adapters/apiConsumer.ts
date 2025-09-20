@@ -6,6 +6,8 @@ import type { Agreement } from "@/domain/entities/Agreement";
 import type { Attachment } from "@/domain/entities/Attachment";
 import { Announcement } from "@/domain/entities/Announcement";
 import { Recommendation } from "@/domain/entities/Recommendation";
+import { Event } from "@/domain/entities/Event";
+import { Feature } from "@/domain/entities/Feature";
 
 type GetOpts = {
   tag?: string;
@@ -40,7 +42,7 @@ export const apiConsumer = {
   announcement: (slug: string) => getJSON<Announcement>(`/api/announcements/${slug}`, { tag: TAGS.ANNOUNCEMENTS }),
   
   events: (p?: { limit?: number; latest?: boolean }) =>
-    getJSON<any[]>(`/api/events`, { tag: TAGS.EVENTS, search: { limit: p?.limit, latest: p?.latest ? 1 : undefined } }),
+    getJSON<Event[]>(`/api/events`, { tag: TAGS.EVENTS, search: { limit: p?.limit, latest: p?.latest ? 1 : undefined } }),
   recommendations: (p?: { limit?: number }) =>
     getJSON<Recommendation[]>(`/api/recommendations`, { tag: TAGS.RECOMMENDATIONS, search: { limit: p?.limit } }),
 
@@ -53,5 +55,5 @@ export const apiConsumer = {
   agreements: () => getJSON<Agreement[]>(`/api/agreements`, { tag: TAGS.AGREEMENTS }),
   agreement: (slug: string) => getJSON<Agreement>(`/api/agreements/${slug}`, { tag: TAGS.AGREEMENTS }),
 
-  features: () => getJSON<any[]>(`/api/features`, { tag: TAGS.FEATURES }),
+  features: () => getJSON<Feature[]>(`/api/features`, { tag: TAGS.FEATURES }),
 };

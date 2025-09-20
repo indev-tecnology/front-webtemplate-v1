@@ -1,7 +1,7 @@
 import { cn } from "@/shared/cn";
 import Image from "next/image";
 import Link from "next/link";
-import { toneClasses, type ToneName } from "@/presentation/components/ui/CardMosaic";
+import { toneClasses, type ToneName } from "@/shared/toneName";
 
 export interface TimeLineSchema {
     image: string;
