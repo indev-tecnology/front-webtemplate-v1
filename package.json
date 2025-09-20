@@ -7,9 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "seed": "tsx scripts/seed.ts",
-    "prebuild": "bash scripts/prebuild.sh"
+    "lint": "next lint"
   },
   "dependencies": {
     "clsx": "^2.1.1",
