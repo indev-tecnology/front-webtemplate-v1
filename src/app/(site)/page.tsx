@@ -13,9 +13,8 @@ import { PillarsCompact, type PillarItem } from "@/presentation/components/ui/Pi
 import { Target, Lightbulb, Users } from "lucide-react";
 import { pillarsConfig, homeCopy, contactInfo, type IconKey } from "@/config/siteStatic";
 import { getCachedAnnouncements, getCachedEventsUpcoming, getCachedFeatures, getCachedRecommendationsLatest } from "@/application/cached";
-import { env } from "@/config/env";
 
-export const revalidate = env.NEXT_REVALIDATE_SECONDS;
+export const revalidate = 86400;
 // Información clave
 function InfoClave() {
   return (

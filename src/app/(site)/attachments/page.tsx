@@ -4,13 +4,12 @@ import { Card } from "@/presentation/components/ui/Card";
 import TextLink from "@/presentation/components/ui/TextLink";
 import { fmtMB } from "@/shared/bytes";
 import { getCachedAttachments } from "@/application/cached";
-import { env } from "@/config/env";
 
 export const metadata = { title: "Anexos" };
 
 type SP = Record<string, string | string[] | undefined>;
 
-export const revalidate = env.NEXT_REVALIDATE_SECONDS;
+export const revalidate = 86400;
 
 export default async function Anexos(
   { searchParams }: { searchParams: Promise<SP> }

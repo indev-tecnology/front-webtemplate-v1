@@ -26,20 +26,20 @@ const ttl = env.NEXT_REVALIDATE_SECONDS;
 export const getCachedNav = cache(
   async () => new GetNavigation(new MongoNavigationRepository()).exec(),
   [TAGS.NAV],
-  { revalidate: ttl, tags: [TAGS.NAV] },
+  { revalidate: false, tags: [TAGS.NAV] },
 );
 
 export const getCachedFooter = cache(
   async () => new GetFooter(new MongoFooterRepository()).exec(),
   [TAGS.FOOTER],
-  { revalidate: ttl, tags: [TAGS.FOOTER] },
+  { revalidate: false, tags: [TAGS.FOOTER] },
 );
 
 export async function getCachedAnnouncements(limit: number) {
   const fn = cache(
     async () => new ListAnnouncements(new MongoAnnouncementRepository()).exec(limit),
     [TAGS.ANNOUNCEMENTS, `limit:${limit}`],
-    { revalidate: ttl, tags: [TAGS.ANNOUNCEMENTS] },
+    { revalidate: false, tags: [TAGS.ANNOUNCEMENTS] },
   );
   return fn();
 }
@@ -48,7 +48,7 @@ export async function getCachedEventsUpcoming(limit: number) {
   const fn = cache(
     async () => new ListEvents(new MongoEventRepository()).exec(limit),
     [TAGS.EVENTS, `limit:${limit}`],
-    { revalidate: ttl, tags: [TAGS.EVENTS] },
+    { revalidate: false, tags: [TAGS.EVENTS] },
   );
   return fn();
 }
@@ -57,7 +57,7 @@ export async function getCachedFeatures(limit: number) {
   const fn = cache(
     async () => new ListFeatures(new MongoFeatureRepository()).exec(limit),
     [TAGS.FEATURES, `limit:${limit}`],
-    { revalidate: ttl, tags: [TAGS.FEATURES] },
+    { revalidate: false, tags: [TAGS.FEATURES] },
   );
   return fn();
 }
@@ -66,7 +66,7 @@ export async function getCachedRecommendationsLatest(limit: number) {
   const fn = cache(
     async () => new MongoRecommendationRepository().listLatest(limit),
     [TAGS.RECOMMENDATIONS, `limit:${limit}`],
-    { revalidate: ttl, tags: [TAGS.RECOMMENDATIONS] },
+    { revalidate: false, tags: [TAGS.RECOMMENDATIONS] },
   );
   return fn();
 }
@@ -75,7 +75,7 @@ export async function getCachedServices() {
   const fn = cache(
     async () => new ListServices(new MongoServiceRepository()).exec(),
     [TAGS.SERVICES],
-    { revalidate: ttl, tags: [TAGS.SERVICES] },
+    { revalidate: false, tags: [TAGS.SERVICES] },
   );
   return fn();
 }
@@ -90,7 +90,7 @@ export async function getCachedAttachments(params: { category?: string; q?: stri
   const fn = cache(
     async () => new ListAttachments(new MongoAttachmentRepository()).exec(params),
     [TAGS.ATTACHMENTS, key],
-    { revalidate: ttl, tags: [TAGS.ATTACHMENTS] },
+    { revalidate: false, tags: [TAGS.ATTACHMENTS] },
   );
   return fn();
 }
@@ -99,7 +99,7 @@ export async function getCachedServiceBySlug(slug: string) {
   const fn = cache(
     async () => new GetServiceBySlug(new MongoServiceRepository()).exec(slug),
     [TAGS.SERVICES, `slug:${slug}`],
-    { revalidate: ttl, tags: [TAGS.SERVICES] },
+    { revalidate: false, tags: [TAGS.SERVICES] },
   );
   return fn();
 }

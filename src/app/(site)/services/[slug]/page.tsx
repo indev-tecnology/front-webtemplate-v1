@@ -1,9 +1,8 @@
 import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
 import { Card } from "@/presentation/components/ui/Card";
 import { getCachedServiceBySlug } from "@/application/cached";
-import { env } from "@/config/env";
 
-export const revalidate = env.NEXT_REVALIDATE_SECONDS;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }:{ params: Promise<{slug:string}> }){
   const { slug } = await params; 

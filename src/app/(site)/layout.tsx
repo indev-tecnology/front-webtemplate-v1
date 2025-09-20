@@ -2,10 +2,9 @@ import "../globals.css";
 import { Navbar } from "@/presentation/components/Navbar";
 import { Footer } from "@/presentation/components/Footer";
 import { siteMeta, contactInfo, socialLinks } from "@/config/siteStatic";
-import { env } from "@/config/env";
 import { getCachedNav, getCachedFooter } from "@/application/cached";
 
-export const revalidate = env.NEXT_REVALIDATE_SECONDS;
+export const revalidate = 86400;
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   let nav: any = null;
