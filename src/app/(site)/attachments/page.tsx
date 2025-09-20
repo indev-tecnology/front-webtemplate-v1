@@ -3,11 +3,14 @@ import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
 import { Card } from "@/presentation/components/ui/Card";
 import TextLink from "@/presentation/components/ui/TextLink";
 import { fmtMB } from "@/shared/bytes";
-import { apiConsumer } from "@/presentation/adapters/apiConsumer";
+import { getCachedAttachments } from "@/application/cached";
+import { env } from "@/config/env";
 
 export const metadata = { title: "Anexos" };
 
 type SP = Record<string, string | string[] | undefined>;
+
+export const revalidate = env.NEXT_REVALIDATE_SECONDS;
 
 export default async function Anexos(
   { searchParams }: { searchParams: Promise<SP> }
@@ -21,7 +24,7 @@ export default async function Anexos(
   const page = pageStr ? Number(pageStr) : 1;
   const pageSize = 24;
 
-  const { items, total } = await apiConsumer.attachments({ category, q, page, pageSize });
+  const { items, total } = await getCachedAttachments({ category, q, page, pageSize });
   const pages = Math.max(1, Math.ceil(total / pageSize));
 
   return (

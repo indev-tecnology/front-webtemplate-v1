@@ -25,11 +25,11 @@ export interface ContactCardProps {
 
 const toneMap: Record<NonNullable<ContactCardProps["tone"]>, { accent: string; button: string; buttonHover: string; bubble: string; overlay: string }> = {
   brand: {
-    accent: "text-tone-brand-600",
-    button: "bg-tone-brand-600",
-    buttonHover: "hover:bg-tone-brand-500",
-    bubble: "bg-tone-brand-500/15",
-    overlay: "bg-tone-brand-500/10",
+    accent: "text-brand-600",
+    button: "bg-brand-600",
+    buttonHover: "hover:bg-brand-500",
+    bubble: "bg-brand-500/15",
+    overlay: "bg-brand-500/10",
   },
   blue: {
     accent: "text-tone-blue-600",

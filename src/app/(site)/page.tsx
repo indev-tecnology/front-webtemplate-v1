@@ -1,11 +1,10 @@
-import { apiConsumer } from "@/presentation/adapters/apiConsumer";
+// Evitamos fetch a /api durante el build; usamos casos de uso directamente
 import {Section} from "@/presentation/components/ui/SectionPage";
 import { Announcement } from "@/domain/entities/Announcement";
 import {TimeLine, TimeLineSchema} from "@/presentation/components/ui/TimeLine";
 import HeroFull, {HeroFullSlide} from "@/presentation/components/ui/HeroFull";
-import FeaturesLinks, {FeaturesLinksProps} from "@/presentation/components/ui/FeaturesLinks";
+import FeaturesLinks from "@/presentation/components/ui/FeaturesLinks";
 import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
-import { Recommendation } from "@/domain/entities/Recommendation";
 import { TipsMosaic } from "@/presentation/components/ui/TipsMosaic";
 import ContactCard from "@/presentation/components/ui/ContactCard";
 import type { EventItem } from "@/presentation/components/ui/EventsMosaic";
@@ -13,6 +12,10 @@ import EventsSplitView from "@/presentation/components/ui/EventsSplitView";
 import { PillarsCompact, type PillarItem } from "@/presentation/components/ui/PillarsCompact";
 import { Target, Lightbulb, Users } from "lucide-react";
 import { pillarsConfig, homeCopy, contactInfo, type IconKey } from "@/config/siteStatic";
+import { getCachedAnnouncements, getCachedEventsUpcoming, getCachedFeatures, getCachedRecommendationsLatest } from "@/application/cached";
+import { env } from "@/config/env";
+
+export const revalidate = env.NEXT_REVALIDATE_SECONDS;
 // Información clave
 function InfoClave() {
   return (
@@ -47,24 +50,14 @@ async function dataHero(data:any[]): Promise<HeroFullSlide[]> {
   }));
 }
 
-async function fetchRecomendations(): Promise<TimeLineSchema[]> {
-  const recsRaw: Recommendation[] = await apiConsumer.recommendations({ limit: 4 });
-  const recs: TimeLineSchema[] = recsRaw.map(r => ({
-    image: r.image?.url || '/images/wcs_default.png',
-    title: r.title,
-    description: r.description || '',
-    cta: r.cta ? { label: r.cta.label, href: r.cta.href } : undefined,
-    brand: r.badge || undefined,
-    tone: r.tone as TimeLineSchema['tone'] || undefined,
-  }));
-  return recs;
-}
+// (Se elimina fetchRecomendations para evitar fetch relativo en build)
 
 export default async function Home() {
-  const announcements: Announcement[] = await apiConsumer.announcements({ limit: 5, latest: true });
+  // Datos mediante casos de uso con Data Cache (evita fetch relativo en build)
+  const announcements: Announcement[] = await getCachedAnnouncements(5);
   const heroSlides: HeroFullSlide[] = await dataHero(announcements);
-  const featuresLinks = await apiConsumer.features(); 
-  const eventsRaw: any[] = await apiConsumer.events({ limit: 10, latest: true });
+  const featuresLinks = await getCachedFeatures(12);
+  const eventsRaw: any[] = await getCachedEventsUpcoming(10) as any[];
   const eventsItems: EventItem[] = (eventsRaw || []).map((e: any) => ({
     image: e?.image?.url || '/images/wcs_default.png',
     title: e?.title ?? '',
@@ -77,7 +70,16 @@ export default async function Home() {
     published: true,
     featured: false,
   }));
-  const itemsRecomendations: TimeLineSchema[] = await fetchRecomendations();
+  // Recomendaciones (últimas visibles)
+  const recsRaw = await getCachedRecommendationsLatest(4);
+  const itemsRecomendations: TimeLineSchema[] = recsRaw.map(r => ({
+    image: r.image?.url || '/images/wcs_default.png',
+    title: r.title,
+    description: r.description || '',
+    cta: r.cta ? { label: r.cta.label, href: r.cta.href } : undefined,
+    brand: r.badge || undefined,
+    tone: r.tone as TimeLineSchema['tone'] || undefined,
+  }));
   // Mapeo de iconos desde claves declaradas en la config estática
   const iconMap: Record<IconKey, React.ElementType<{ className?: string }>> = {
     target: Target,

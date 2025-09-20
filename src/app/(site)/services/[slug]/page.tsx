@@ -1,16 +1,19 @@
 import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
 import { Card } from "@/presentation/components/ui/Card";
-import { apiConsumer } from "@/presentation/adapters/apiConsumer";
+import { getCachedServiceBySlug } from "@/application/cached";
+import { env } from "@/config/env";
+
+export const revalidate = env.NEXT_REVALIDATE_SECONDS;
 
 export async function generateMetadata({ params }:{ params: Promise<{slug:string}> }){
   const { slug } = await params; 
-  const s = await apiConsumer.service(slug);
+  const s = await getCachedServiceBySlug(slug);
   
   return { title: s?.name || "Servicio" };
 }
 
 export default async function ServiceDetail({ params }:{ params: Promise<{slug:string}> }){
-  const { slug } = await params; const s = await apiConsumer.service(slug);
+  const { slug } = await params; const s = await getCachedServiceBySlug(slug);
   if(!s) return <div className="p-8">Servicio no disponible.</div>;
 
   return (

@@ -1,14 +1,22 @@
 import "../globals.css";
 import { Navbar } from "@/presentation/components/Navbar";
 import { Footer } from "@/presentation/components/Footer";
-import { apiConsumer } from "@/presentation/adapters/apiConsumer";
 import { siteMeta, contactInfo, socialLinks } from "@/config/siteStatic";
+import { env } from "@/config/env";
+import { getCachedNav, getCachedFooter } from "@/application/cached";
+
+export const revalidate = env.NEXT_REVALIDATE_SECONDS;
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const nav = await apiConsumer.nav();
+  let nav: any = null;
+  try {
+    nav = await getCachedNav();
+  } catch {
+    nav = { items: [] };
+  }
   let footer: any = null;
   try {
-    footer = await apiConsumer.footer();
+    footer = await getCachedFooter();
   } catch {
     footer = null;
   }
@@ -18,7 +26,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         title: "Contacto",
         links: [
           contactInfo.email ? { href: `mailto:${contactInfo.email}`, label: contactInfo.email } : null,
-          contactInfo.phone ? { href: `tel:${contactInfo.phone.replace(/\\s+/g, '')}`, label: contactInfo.phone } : null,
+          contactInfo.phone ? { href: `tel:${contactInfo.phone.replace(/\s+/g, '')}`, label: contactInfo.phone } : null,
           contactInfo.address ? { href: "#", label: contactInfo.address } : null,
           contactInfo.schedule ? { href: "#", label: contactInfo.schedule } : null,
         ].filter(Boolean),
