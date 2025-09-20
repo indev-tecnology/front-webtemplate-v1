@@ -14,6 +14,8 @@ import { MongoEventRepository } from '@/infrastructure/repositories/MongoEventRe
 import { ListFeatures } from '@/application/use-cases/Feature/GetFeatures';
 import { MongoFeatureRepository } from '@/infrastructure/repositories/MongoFeatureRepository';
 import { MongoRecommendationRepository } from '@/infrastructure/repositories/MongoRecommendationRepository';
+import { MongoAgreementRepository } from '@/infrastructure/repositories/MongoAgreementRepository';
+import type { Agreement } from '@/domain/entities/Agreement';
 import { ListServices } from '@/application/use-cases/Services/ListServices';
 import { MongoServiceRepository } from '@/infrastructure/repositories/MongoServiceRepository';
 import { GetServiceBySlug } from '@/application/use-cases/Services/GetServiceBySlug';
@@ -100,6 +102,24 @@ export async function getCachedServiceBySlug(slug: string) {
     async () => new GetServiceBySlug(new MongoServiceRepository()).exec(slug),
     [TAGS.SERVICES, `slug:${slug}`],
     { revalidate: false, tags: [TAGS.SERVICES] },
+  );
+  return fn();
+}
+
+export async function getCachedAgreements(): Promise<Agreement[]> {
+  const fn = cache(
+    async () => new MongoAgreementRepository().listAll(),
+    [TAGS.AGREEMENTS],
+    { revalidate: false, tags: [TAGS.AGREEMENTS] },
+  );
+  return fn();
+}
+
+export async function getCachedAgreementBySlug(slug: string): Promise<Agreement | null> {
+  const fn = cache(
+    async () => new MongoAgreementRepository().getBySlug(slug),
+    [TAGS.AGREEMENTS, `slug:${slug}`],
+    { revalidate: false, tags: [TAGS.AGREEMENTS] },
   );
   return fn();
 }

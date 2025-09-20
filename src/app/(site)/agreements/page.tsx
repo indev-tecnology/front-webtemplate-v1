@@ -3,16 +3,14 @@ import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
 import { Card } from "@/presentation/components/ui/Card";
 import TextLink from "@/presentation/components/ui/TextLink";
 import { fmtCo } from "@/shared/date";
+import { getCachedAgreements } from "@/application/cached";
 
-async function getAgreements(){
-  const r = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/agreements`, { next:{ revalidate:60 }});
-  return r.ok ? r.json() : [];
-}
+export const revalidate = 86400;
 
 export const metadata = { title: "Convenios" };
 
 export default async function Convenios(){
-  const items = await getAgreements();
+  const items = await getCachedAgreements();
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-8">
       <SectionHeader title="Convenios" description="Alianzas estratégicas que potencian nuestro impacto." align="center" />
