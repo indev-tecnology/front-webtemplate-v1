@@ -2,12 +2,15 @@ import Image from "next/image";
 import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
 import { Card } from "@/presentation/components/ui/Card";
 import TextLink from "@/presentation/components/ui/TextLink";
-import { apiConsumer } from "@/presentation/adapters/apiConsumer";
+import { getCachedServices } from "@/application/cached";
+import { env } from "@/config/env";
 
 export const metadata = { title: "Servicios" };
 
+export const revalidate = env.NEXT_REVALIDATE_SECONDS;
+
 export default async function Services(){
-  const services = await apiConsumer.services();
+  const services = await getCachedServices();
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-8">
       <SectionHeader title="Servicios" description="Soluciones diseñadas para impacto y escala." align="center" />
