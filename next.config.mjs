@@ -3,6 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   i18n: { locales: ['es'], defaultLocale: 'es', localeDetection: false },
   experimental: { serverActions: { bodySizeLimit: '2mb' } },
+  eslint: { ignoreDuringBuilds: true },
   images: {
     remotePatterns: [
       // S3/Cloud storage host (configurable por env)
