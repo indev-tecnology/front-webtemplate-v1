@@ -7,7 +7,7 @@ import { GetNavigation } from '@/application/use-cases/GetNavigation';
 import { MongoNavigationRepository } from '@/infrastructure/repositories/MongoNavigationRepository';
 import { GetFooter } from '@/application/use-cases/GetFooter';
 import { MongoFooterRepository } from '@/infrastructure/repositories/MongoFooterRepository';
-import { ListAnnouncements } from '@/application/use-cases/ListAnnouncements';
+import { ListAnnouncements } from '@/application/use-cases/Announcements/ListAnnouncements';
 import { MongoAnnouncementRepository } from '@/infrastructure/repositories/MongoAnnouncementRepository';
 import { ListEvents } from '@/application/use-cases/ListEvents';
 import { MongoEventRepository } from '@/infrastructure/repositories/MongoEventRepository';
@@ -21,6 +21,7 @@ import { MongoServiceRepository } from '@/infrastructure/repositories/MongoServi
 import { GetServiceBySlug } from '@/application/use-cases/Services/GetServiceBySlug';
 import { ListAttachments } from '@/application/use-cases/ListAttachments';
 import { MongoAttachmentRepository } from '@/infrastructure/repositories/MongoAttachmentRepository';
+import { ListAnnouncementsActives } from './use-cases/Announcements/ListAnnouncementsActives';
 
 // TTL por defecto (ISR de datos)
 const ttl = env.NEXT_REVALIDATE_SECONDS;
@@ -40,6 +41,14 @@ export const getCachedFooter = cache(
 export async function getCachedAnnouncements(limit: number) {
   const fn = cache(
     async () => new ListAnnouncements(new MongoAnnouncementRepository()).exec(limit),
+    [TAGS.ANNOUNCEMENTS, `limit:${limit}`],
+    { revalidate: false, tags: [TAGS.ANNOUNCEMENTS] },
+  );
+  return fn();
+}
+export async function getCachedAnnouncementsActives(limit: number) {
+  const fn = cache(
+    async () => new ListAnnouncementsActives(new MongoAnnouncementRepository()).exec(limit),
     [TAGS.ANNOUNCEMENTS, `limit:${limit}`],
     { revalidate: false, tags: [TAGS.ANNOUNCEMENTS] },
   );

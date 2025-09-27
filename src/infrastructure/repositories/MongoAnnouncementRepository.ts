@@ -24,7 +24,7 @@ function activeFilter(now = new Date()) {
   return {
     visible: { $ne: false },
     $and: [
-      { $or: [{ publishedAt: { $exists: false } }, { publishedAt: { $lte: now } }] },
+      { $and: [{ publishedAt: { $lte: now } }] },
       { $or: [{ expiresAt: { $exists: false } }, { expiresAt: null }, { expiresAt: { $gt: now } }] },
     ],
   };
@@ -46,7 +46,7 @@ export class MongoAnnouncementRepository {
     const docs = await c
       // Mostrar aunque la fecha sea vieja o esté expirada; sólo respetar visibilidad
       .find({ visible: { $ne: false } })
-      .sort({ publishedAt: -1, createdAt: -1 })
+      .sort({ createdAt: -1, publishedAt: -1 })
       .limit(limit)
       .toArray();
     return docs.map(map);
