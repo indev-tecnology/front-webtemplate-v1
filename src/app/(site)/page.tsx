@@ -6,11 +6,11 @@ import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
 import { TipsMosaic,TipItem } from "@/presentation/components/ui/TipsMosaic";
 import ContactCard from "@/presentation/components/ui/ContactCard";
 import type { EventItem } from "@/presentation/components/ui/EventsMosaic";
-import EventsSplitView from "@/presentation/components/ui/EventsSplitView";
+import EventsShowcase from "@/presentation/components/ui/EventsShowcase";
 import { PillarsCompact, type PillarItem } from "@/presentation/components/ui/PillarsCompact";
 import { Target, Lightbulb, Users } from "lucide-react";
 import { pillarsConfig, homeCopy, contactInfo, type IconKey } from "@/config/siteStatic";
-import { getCachedAnnouncements, getCachedAnnouncementsActives, getCachedEventsUpcoming, getCachedFeatures, getCachedRecommendationsLatest } from "@/application/cached";
+import { getCachedAnnouncements, getCachedAnnouncementsActives, getCachedEventsUpcoming, getCachedFeatures } from "@/application/cached";
 
 export const revalidate = 86400;
 // Información clave
@@ -68,18 +68,25 @@ export default async function Home() {
   const featuresLinks = await getCachedFeatures(12);
   const mapperRecommendations = await dataRecommendations();
   const eventsRaw: any[] = await getCachedEventsUpcoming(10) as any[];
-  const eventsItems: EventItem[] = (eventsRaw || []).map((e: any) => ({
-    image: e?.image?.url || '/images/wcs_default.png',
-    title: e?.title ?? '',
-    description: e?.description ?? '',
-    date: e?.startsAt,
-    endDate: e?.endsAt,
-    location: e?.location,
-    // cta opcional: activa si tienes página de detalle
-    // cta: { label: 'Ver detalles', href: `/eventos/${e.slug || e.id}` },
-    published: true,
-    featured: false,
-  }));
+  const eventsItems: EventItem[] = (eventsRaw || []).map((e: any) => {
+    const detailSlug = e?.slug ? `/eventos/${e.slug}` : undefined;
+    const fallbackHref = e?.url || e?.href || detailSlug;
+    const ctaHref = e?.cta?.href || fallbackHref;
+    const ctaLabel = e?.cta?.label || (ctaHref ? 'View Details' : undefined);
+    const isExternal = e?.cta?.external ?? (ctaHref ? /^https?:\/\//.test(ctaHref) && !ctaHref.startsWith('/') : false);
+
+    return {
+      image: e?.image?.url || '/images/wcs_default.png',
+      title: e?.title ?? '',
+      description: e?.description ?? '',
+      date: e?.startsAt,
+      endDate: e?.endsAt,
+      location: e?.location,
+      cta: ctaHref && ctaLabel ? { label: ctaLabel, href: ctaHref, external: isExternal } : undefined,
+      published: e?.published ?? true,
+      featured: e?.featured ?? false,
+    } satisfies EventItem;
+  });
   // Mapeo de iconos desde claves declaradas en la config estática
   const iconMap: Record<IconKey, React.ElementType<{ className?: string }>> = {
     target: Target,
@@ -118,8 +125,14 @@ export default async function Home() {
         />
       </Section>
       <Section id="sectionEvents" ariaLabel="Eventos y anuncios" pad="standard">
-        <SectionHeader title={homeCopy.events.title} tone="sun" className="mb-5"/>
-        <EventsSplitView items={eventsItems} maxList={6} />
+        <EventsShowcase
+          items={eventsItems}
+          title={homeCopy.events.title}
+          pastLabel="Eventos anteriores"
+          detailsHref="/eventos"
+          allEventsHref="/eventos"
+          allEventsLabel="Ver todos los eventos"
+        />
       </Section>
       <Section id="sectionContact" ariaLabel="Sección de contacto" pad="standard" tone="muted">
         <ContactCard title={homeCopy.contact.title} subtitle={homeCopy.contact.subtitle} tone={homeCopy.contact.tone} email={contactInfo.email} phone={contactInfo.phone} />
