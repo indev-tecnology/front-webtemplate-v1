@@ -128,7 +128,7 @@ export default async function Home() {
         <EventsShowcase
           items={eventsItems}
           title={homeCopy.events.title}
-          pastLabel="Eventos anteriores"
+          pastLabel="Otros eventos"
           detailsHref="/eventos"
           allEventsHref="/eventos"
           allEventsLabel="Ver todos los eventos"
@@ -136,6 +136,9 @@ export default async function Home() {
       </Section>
       <Section id="sectionContact" ariaLabel="Sección de contacto" pad="standard" tone="muted">
         <ContactCard title={homeCopy.contact.title} subtitle={homeCopy.contact.subtitle} tone={homeCopy.contact.tone} email={contactInfo.email} phone={contactInfo.phone} />
+      </Section>
+      <Section id="sectionFlaterFooter" className="p-5" tone="brand">
+        <h3>{homeCopy.flayers.footer}</h3>
       </Section>
     </div>
   );
