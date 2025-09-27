@@ -79,8 +79,11 @@ export const homeCopy = {
     title: "Eventos y novedades",
   },
   contact: {
-    title: "Construyamos algo juntos",
-    subtitle: "Completa el formulario y agenda una llamada con nuestro equipo de especialistas.",
+    title: "Comunicate con nosotros",
+    subtitle: "Nuestros medios de contacto estan a tu disposición, si tienes algo para nosotros no dudes en comunicarlo por este medio.",
     tone: "sun" as ToneKey,
   },
+  flayers:{
+    footer: "Cointramin garantiza la protección de información de terceros - Ley Estatutaria 1581 de 2012"
+  }
 };
