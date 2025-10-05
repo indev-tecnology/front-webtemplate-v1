@@ -1,8 +1,8 @@
-// Configuración estática (sin BD) para el sitio.
-import 'server-only';
+
 // Mantén aquí contenido poco cambiante: textos institucionales, enlaces, datos de contacto, etc.
 
 import type { ToneKey } from "@/shared/tone";
+import { FooterSection, SocialLink } from '@/presentation/web-ui/Footer';
 
 // Iconos: pasamos solo una clave, y en el componente se mapea a un icono real
 export type IconKey = "target" | "lightbulb" | "users";
@@ -40,28 +40,69 @@ export const pillarsConfig: PillarConfigItem[] = [
 
 // Ejemplo de otros datos estáticos que podrías centralizar aquí
 export const siteMeta = {
+  logo: "/images/web-logo.png", // Logo principal del sitio
+  favicon: "/favicon.ico",
+  keywords:
+    "cooperativa, ahorro, crédito, finanzas, servicios financieros, asociados, préstamos, inversión",
   brandName: "Tu Entidad",
   shortName: "Entidad",
   tagline: "Compromiso, innovación y servicio.",
   locale: "es-CO",
 };
 
+// Footer
+export const footerSections: FooterSection[] = [
+  {
+    title: 'Servicios',
+    links: [
+      { label: 'Créditos', href: '/servicios/creditos' },
+      { label: 'Ahorro e inversión', href: '/servicios/ahorro' },
+      { label: 'Seguros', href: '/servicios/seguros' },
+      { label: 'Educación financiera', href: '/servicios/educacion' },
+    ],
+  },
+  {
+    title: 'Institucional',
+    links: [
+      { label: 'Quiénes somos', href: '/nosotros' },
+      { label: 'Misión y visión', href: '/nosotros/mision-vision' },
+      { label: 'Gobierno corporativo', href: '/nosotros/gobierno' },
+      { label: 'Trabaja con nosotros', href: '/trabaja-con-nosotros' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Políticas de privacidad', href: '/politicas' },
+      { label: 'Términos y condiciones', href: '/terminos' },
+      { label: 'Protección de datos', href: '/proteccion-datos' },
+      { label: 'SARLAFT', href: '/sarlaft' },
+    ],
+  },
+];
+
 export const contactInfo = {
-  phone: "+57 300 000 0000",
-  email: "contacto@tu-entidad.gov.co",
-  address: "Cra 0 # 00-00, Ciudad, País",
-  schedule: "Lun–Vie 8:00–17:00",
+  email: 'atencion@cooperativa.coop',
+  phone: '+57 (601) 234 5678',
+  address: 'Calle 72 #10-51, Bogotá D.C., Colombia',
 };
 
-export const socialLinks = {
-  facebook: "https://facebook.com/tuentidad",
-  instagram: "https://instagram.com/tuentidad",
-  youtube: "https://youtube.com/@tuentidad",
-  x: "https://x.com/tuentidad",
-};
+export const socialLinks: SocialLink[] = [
+  { icon: 'facebook', href: 'https://facebook.com/cooperativa', label: 'Facebook' },
+  { icon: 'instagram', href: 'https://instagram.com/cooperativa', label: 'Instagram' },
+  { icon: 'twitter', href: 'https://twitter.com/cooperativa', label: 'Twitter' },
+  { icon: 'linkedin', href: 'https://linkedin.com/company/cooperativa', label: 'LinkedIn' },
+];
 
 // Copia fija del Home (sin i18n)
-export const homeCopy = {
+export const homeSections = {
+  services: {
+    subtitle: "Nuestros servicios",
+    title: "Soluciones para tu bienestar financiero",
+    description: "Ofrecemos una amplia gama de servicios diseñados para apoyar tu crecimiento personal y familiar en el sector solidario.",
+    align: "center",
+    className: "mb-12",
+  },
   features: {
     title: "Principales servicios",
     description: "Conoce más sobre algunos de nuestros principales servicios que tenemos para ti.",
