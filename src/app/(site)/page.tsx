@@ -27,32 +27,23 @@ import HighlightSlider from '@/presentation/web-ui/shared/HighlightSlider';
 // Slides del Hero
 const heroSlides: HeroSlide[] = [
   {
-    title: 'Construyendo futuro juntos',
-    subtitle: 'Bienvenido a tu cooperativa',
-    description: 'Más de 15 años apoyando el crecimiento económico y social de nuestros asociados en todo el país.',
-    image: '/images/flayers/home_flayer_pse.png',
-    ctaLabel: 'Únete ahora',
-    ctaHref: '/vinculacion',
-    ctaVariant: 'secondary',
+    title: 'Horarios de atención',
+    subtitle: 'Conoce nuestros horarios',
+    description: 'Luneas a sabado de 9:00 a.m. a 1:00 p.m.',
+    image: 'https://images.unsplash.com/photo-1593501876007-034449c7fd63?q=80&w=1740',
+    ctaLabel: 'Ver mas',
+    ctaHref: '/blog/horarios-atencion',
+    ctaVariant: 'primary',
   },
   {
     title: 'Créditos con tasas preferenciales',
     subtitle: 'Nuevos beneficios',
     description: 'Accede a créditos de vivienda, educación y libre inversión con las mejores condiciones del mercado solidario.',
-    image: '/images/wcs_default.png',
+    image: 'https://images.unsplash.com/photo-1633158829875-e5316a358c6f?q=80&w=1740',
     ctaLabel: 'Conocer más',
-    ctaHref: '/servicios/creditos',
+    ctaHref: '/services/financial-credit',
     ctaVariant: 'secondary',
-  },
-  {
-    title: 'Ahorra y cumple tus metas',
-    subtitle: 'Planifica tu futuro',
-    description: 'Tenemos cuentas de ahorro programado, CDAT y planes de inversión diseñados para tus objetivos.',
-    image: '/images/wcs_default.png',
-    ctaLabel: 'Ver opciones',
-    ctaHref: '/servicios/ahorro',
-    ctaVariant: 'secondary',
-  },
+  }
 ];
 
 // Estadísticas
@@ -70,7 +61,7 @@ const services: Service[] = [
     slug: 'creditos',
     name: 'Créditos',
     description: 'Crédito de libre inversión, vivienda, vehículo y educación con tasas competitivas y plazos flexibles.',
-    icon: { url: '/images/wcs_default.png', alt: 'Créditos cooperativos' },
+    icon: { url: 'https://images.unsplash.com/photo-1633158829875-e5316a358c6f?q=80&w=1740', alt: 'Créditos cooperativos' },
     tone: 'warm',
     highlights: [
       'Tasas desde 0.9% mensual',
@@ -208,7 +199,7 @@ const announcements: Announcement[] = [
     slug: 'nuevas-tasas-vivienda',
     title: 'Nuevas tasas de interés para créditos de vivienda',
     description: 'A partir del 1 de marzo, contaremos con tasas aún más competitivas para créditos de vivienda, con plazos de hasta 20 años.',
-    image: { url: '/images/wcs_default.png', alt: 'Créditos de vivienda' },
+    image: { url: 'https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?q=80&w=1546', alt: 'Créditos de vivienda' },
     tags: ['Créditos'],
     pinned: true,
     priority: 10,

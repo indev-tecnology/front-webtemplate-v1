@@ -1,7 +1,4 @@
-'use client';
-
 import { forwardRef, type HTMLAttributes } from 'react';
-import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -28,17 +25,13 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     };
 
     return (
-      <motion.div
+      <div
         ref={ref}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.4, ease: 'easeOut' }}
         className={clsx(baseStyles, variants[variant], paddings[padding], className)}
-        {...(props as any)}
+        {...props}
       >
         {children}
-      </motion.div>
+      </div>
     );
   }
 );
