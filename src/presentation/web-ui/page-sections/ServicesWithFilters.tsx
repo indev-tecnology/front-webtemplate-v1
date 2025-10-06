@@ -23,7 +23,6 @@ export const ServicesWithFilters = ({ services }: ServicesWithFiltersProps) => {
         <ContentGrid columns={3} gap="lg">
           {filteredServices.map((service) => (
             <ServiceCard
-              key={service.id}
               service={service}
               href={`/services/${service.slug}`}
             />

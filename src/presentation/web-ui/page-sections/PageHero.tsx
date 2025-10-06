@@ -20,47 +20,52 @@ export const PageHero = ({
   size = 'default',
   className,
 }: PageHeroProps) => {
-  const toneStyles = {
-    blue: {
-      gradient: 'from-tone-blue-50 via-white to-tone-blue-50/30',
-      accent: 'bg-tone-blue-500',
-      text: 'text-tone-blue-600',
-    },
-    teal: {
-      gradient: 'from-tone-teal-50 via-white to-tone-teal-50/30',
-      accent: 'bg-tone-teal-500',
-      text: 'text-tone-teal-600',
-    },
+  const toneStyles: Record<ToneKey, { gradient: string; text: string; accent: string }> = {
     green: {
-      gradient: 'from-tone-green-50 via-white to-tone-green-50/30',
-      accent: 'bg-tone-green-500',
-      text: 'text-tone-green-600',
+      gradient: 'from-green-50 to-green-100',
+      text: 'text-green-600',
+      accent: 'bg-green-600',
     },
-    violet: {
-      gradient: 'from-tone-violet-50 via-white to-tone-violet-50/30',
-      accent: 'bg-tone-violet-500',
-      text: 'text-tone-violet-600',
-    },
-    coral: {
-      gradient: 'from-tone-coral-50 via-white to-tone-coral-50/30',
-      accent: 'bg-tone-coral-500',
-      text: 'text-tone-coral-600',
-    },
-    sun: {
-      gradient: 'from-tone-sun-50 via-white to-tone-sun-50/30',
-      accent: 'bg-tone-sun-500',
-      text: 'text-tone-sun-600',
+    blue: {
+      gradient: 'from-blue-50 to-blue-100',
+      text: 'text-blue-600',
+      accent: 'bg-blue-600',
     },
     warm: {
-      gradient: 'from-tone-warm-50 via-white to-tone-warm-50/30',
-      accent: 'bg-tone-warm-500',
-      text: 'text-tone-warm-600',
+      gradient: 'from-yellow-50 to-orange-100',
+      text: 'text-orange-600',
+      accent: 'bg-orange-600',
+    },
+    brand: {
+      gradient: '',
+      text: '',
+      accent: ''
+    },
+    teal: {
+      gradient: '',
+      text: '',
+      accent: ''
+    },
+    violet: {
+      gradient: '',
+      text: '',
+      accent: ''
+    },
+    coral: {
+      gradient: '',
+      text: '',
+      accent: ''
+    },
+    sun: {
+      gradient: '',
+      text: '',
+      accent: ''
     },
     muted: {
-      gradient: 'from-tone-muted-50 via-white to-tone-muted-50/30',
-      accent: 'bg-tone-muted-500',
-      text: 'text-tone-muted-600',
-    },
+      gradient: '',
+      text: '',
+      accent: ''
+    }
   };
 
   const colors = toneStyles[tone];

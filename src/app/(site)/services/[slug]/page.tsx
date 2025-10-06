@@ -27,15 +27,15 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
     }
 
     return {
-      title: `${service.name} | Servicios | Cooperativa`,
-      description: service.description || `Conoce todo sobre nuestro servicio de ${service.name}. Soluciones del sector solidario diseñadas para tu bienestar financiero.`,
-      keywords: [service.name, 'cooperativa', 'servicios financieros', 'sector solidario', ...(service.highlights || [])],
+      title: `${service.title} | Servicios | Cooperativa`,
+      description: service.summary || `Conoce todo sobre nuestro servicio de ${service.title}. Soluciones del sector solidario diseñadas para tu bienestar financiero.`,
+      keywords: [service.title, 'cooperativa', 'servicios financieros', 'sector solidario', ...(service.tags || [])],
       openGraph: {
-        title: service.name,
-        description: service.description || '',
-        images: service.icon?.url ? [{
-          url: service.icon.url,
-          alt: service.icon.alt || service.name,
+        title: service.title,
+        description: service.summary || '',
+        images: service.heroImage?.url ? [{
+          url: service.heroImage.url,
+          alt: service.heroImage.alt || service.title,
           width: 1200,
           height: 630,
         }] : [],
@@ -44,9 +44,9 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
       },
       twitter: {
         card: 'summary_large_image',
-        title: service.name,
-        description: service.description,
-        images: service.icon?.url ? [service.icon.url] : [],
+        title: service.title,
+        description: service.summary,
+        images: service.heroImage?.url ? [service.heroImage.url] : [],
       },
     };
   } catch (error) {
@@ -82,16 +82,16 @@ export default async function ServicioDetailPage({ params }: ServicePageProps) {
   return (
     <PageLayout
       hero={{
-        title: service.name,
+        title: service.title,
         subtitle: 'Nuestros servicios',
-        description: service.description,
+        description: service.summary,
         tone: service.tone || 'green',
         align: 'left',
 
       }}
       breadcrumbs={[
         { label: 'Servicios', href: '/services' },
-        { label: service.name },
+        { label: service.title },
       ]}
     >
       <ServiceDetailTemplate service={service} />
