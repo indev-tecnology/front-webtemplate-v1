@@ -5,11 +5,11 @@ type Block =
   | { type: "paragraph"; text: string }
   | { type: "list"; style: "ul"|"ol"; items: string[] }
   | { type: "image"; attachmentId: string; alt?: string; caption?: string }
-  | { type: "attachment"; attachmentId: String; label?: string }
+  | { type: "attachment"; attachmentId: string; label?: string }
   | { type: "cta"; label: string; href: string };
 
 interface Attachment {
-  id: String;
+  id: string;
   filename: string;
   url: string;             // S3 signed or public
   contentType: string;
@@ -20,7 +20,7 @@ interface Attachment {
 }
 
 export interface Service {
-  id: String;
+  id: string;
   title: string;
   slug: string;            // unique
   summary?: string;
