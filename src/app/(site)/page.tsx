@@ -1,145 +1,315 @@
-// Evitamos fetch a /api durante el build; usamos casos de uso directamente
-import {Section} from "@/presentation/components/ui/SectionPage";
-import HeroFull, {HeroFullSlide} from "@/presentation/components/ui/HeroFull";
-import FeaturesLinks from "@/presentation/components/ui/FeaturesLinks";
-import { SectionHeader } from "@/presentation/components/ui/SectionHeader";
-import { TipsMosaic,TipItem } from "@/presentation/components/ui/TipsMosaic";
-import ContactCard from "@/presentation/components/ui/ContactCard";
-import type { EventItem } from "@/presentation/components/ui/EventsMosaic";
-import EventsShowcase from "@/presentation/components/ui/EventsShowcase";
-import { PillarsCompact, type PillarItem } from "@/presentation/components/ui/PillarsCompact";
-import { Target, Lightbulb, Users } from "lucide-react";
-import { pillarsConfig, homeCopy, contactInfo, type IconKey } from "@/config/siteStatic";
-import { getCachedAnnouncements, getCachedAnnouncementsActives, getCachedEventsUpcoming, getCachedFeatures } from "@/application/cached";
+'use client';
 
-export const revalidate = 86400;
-// Información clave
-function InfoClave() {
+import { HeroSlider, type HeroSlide } from '@/presentation/web-ui/HeroSlider';
+import { Section } from '@/presentation/web-ui/Section';
+import { SectionHeader } from '@/presentation/web-ui/SectionHeader';
+import { ServicesSection, type Service } from '@/presentation/web-ui/home/ServicesSection';
+import { NewsSection, type Announcement, type Event } from '@/presentation/web-ui/home/NewsSection';
+import { CTASection } from '@/presentation/web-ui/home/CTASection';
+import { StatsSection, type Stat } from '@/presentation/web-ui/home/StatsSection';
+import {
+  Wallet,
+  PiggyBank,
+  GraduationCap,
+  TrendingUp,
+  Shield,
+  Heart,
+  Users,
+  Award,
+  Briefcase,
+  Home as HomeIcon,
+} from 'lucide-react';
+import { homeSections } from '@/config/siteStatic';
+import HighlightSlider from '@/presentation/web-ui/shared/HighlightSlider';
+
+// ==================== DATOS MOCK ====================
+
+// Slides del Hero
+const heroSlides: HeroSlide[] = [
+  {
+    title: 'Horarios de atención',
+    subtitle: 'Conoce nuestros horarios',
+    description: 'Luneas a sabado de 9:00 a.m. a 1:00 p.m.',
+    image: 'https://images.unsplash.com/photo-1593501876007-034449c7fd63?q=80&w=1740',
+    ctaLabel: 'Ver mas',
+    ctaHref: '/blog/horarios-atencion',
+    ctaVariant: 'primary',
+  },
+  {
+    title: 'Créditos con tasas preferenciales',
+    subtitle: 'Nuevos beneficios',
+    description: 'Accede a créditos de vivienda, educación y libre inversión con las mejores condiciones del mercado solidario.',
+    image: 'https://images.unsplash.com/photo-1633158829875-e5316a358c6f?q=80&w=1740',
+    ctaLabel: 'Conocer más',
+    ctaHref: '/services/financial-credit',
+    ctaVariant: 'secondary',
+  }
+];
+
+// Estadísticas
+const stats: Stat[] = [
+  { icon: Users, value: '25', suffix: 'K+', label: 'Asociados activos' },
+  { icon: Award, value: '15', suffix: '+', label: 'Años de experiencia' },
+  { icon: Briefcase, value: '120', suffix: '+', label: 'Convenios vigentes' },
+  { icon: TrendingUp, value: '$85', suffix: 'M', label: 'Patrimonio administrado' },
+];
+
+// Servicios - Adaptado al domain Service
+const services: Service[] = [
+  {
+    id: '1',
+    slug: 'creditos',
+    name: 'Créditos',
+    description: 'Crédito de libre inversión, vivienda, vehículo y educación con tasas competitivas y plazos flexibles.',
+    icon: { url: 'https://images.unsplash.com/photo-1633158829875-e5316a358c6f?q=80&w=1740', alt: 'Créditos cooperativos' },
+    tone: 'warm',
+    highlights: [
+      'Tasas desde 0.9% mensual',
+      'Plazos de hasta 60 meses',
+      'Aprobación en 24 horas'
+    ],
+  },
+  {
+    id: '2',
+    slug: 'ahorro',
+    name: 'Ahorro e Inversión',
+    description: 'Cuentas de ahorro, ahorro programado, CDAT y planes de inversión para hacer crecer tu dinero.',
+    icon: { url: '/images/wcs_default.png', alt: 'Ahorro cooperativo' },
+    tone: 'green',
+    highlights: [
+      'Rentabilidad competitiva',
+      'Sin cuota de manejo',
+      'Disponibilidad 24/7'
+    ],
+  },
+  {
+    id: '3',
+    slug: 'educacion-financiera',
+    name: 'Educación Financiera',
+    description: 'Talleres, seminarios y asesoría personalizada para mejorar tu cultura financiera y tomar mejores decisiones.',
+    icon: { url: '/images/wcs_default.png', alt: 'Educación financiera' },
+    tone: 'violet',
+    highlights: [
+      'Talleres gratuitos',
+      'Certificación disponible',
+      'Modalidad presencial y virtual'
+    ],
+  },
+  {
+    id: '4',
+    slug: 'seguros',
+    name: 'Seguros',
+    description: 'Protección para ti y tu familia: seguros de vida, salud, vehículos y hogar con cobertura amplia.',
+    icon: { url: '/images/wcs_default.png', alt: 'Seguros cooperativos' },
+    tone: 'teal',
+    highlights: [
+      'Coberturas personalizadas',
+      'Asistencia 24/7',
+      'Descuentos para asociados'
+    ],
+  },
+  {
+    id: '5',
+    slug: 'bienestar-social',
+    name: 'Bienestar Social',
+    description: 'Programas de recreación, auxilio de estudio, salud y apoyo solidario para momentos difíciles.',
+    icon: { url: '/images/wcs_default.png', alt: 'Bienestar social' },
+    tone: 'coral',
+    highlights: [
+      'Auxilios educativos',
+      'Eventos recreativos',
+      'Fondo de solidaridad'
+    ],
+  },
+  {
+    id: '6',
+    slug: 'subsidios-vivienda',
+    name: 'Subsidios de Vivienda',
+    description: 'Te acompañamos en el sueño de tu casa propia con asesoría para subsidios y financiación.',
+    icon: { url: '/images/wcs_default.png', alt: 'Subsidios de vivienda' },
+    tone: 'warm',
+    highlights: [
+      'Asesoría especializada',
+      'Trámites simplificados',
+      'Acompañamiento integral'
+    ],
+  },
+];
+
+// Eventos (fieles al domain Event)
+const events: Event[] = [
+  {
+    id: '1',
+    slug: 'asamblea-2025',
+    title: 'Asamblea General Ordinaria 2025',
+    description: 'Participación democrática en las decisiones estratégicas de nuestra cooperativa. Presentación de resultados financieros y proyectos para el próximo año.',
+    image: { url: '/images/wcs_default.png', alt: 'Asamblea General' },
+    location: 'Auditorio Principal - Sede Bogotá',
+    startsAt: new Date('2025-03-15T09:00:00'),
+    endsAt: new Date('2025-03-15T14:00:00'),
+    tags: ['Institucional'],
+  },
+  {
+    id: '2',
+    slug: 'taller-finanzas-personales',
+    title: 'Taller: Finanzas Personales para Principiantes',
+    description: 'Aprende a administrar tu dinero, crear presupuestos efectivos y planificar tu futuro financiero con expertos del sector.',
+    image: { url: '/images/wcs_default.png', alt: 'Taller de finanzas' },
+    location: 'Online - Plataforma Zoom',
+    startsAt: new Date('2025-03-22T15:00:00'),
+    endsAt: new Date('2025-03-22T18:00:00'),
+    tags: ['Educación Financiera'],
+  },
+  {
+    id: '3',
+    slug: 'feria-servicios',
+    title: 'Feria de Servicios Cooperativos',
+    description: 'Conoce todos nuestros servicios, convenios y beneficios. Stands informativos, asesorías personalizadas y actividades para toda la familia.',
+    image: { url: '/images/wcs_default.png', alt: 'Feria de servicios' },
+    location: 'Plaza Central - Centro Comercial Andino',
+    startsAt: new Date('2025-04-05T10:00:00'),
+    tags: ['Feria'],
+  },
+  {
+    id: '4',
+    slug: 'dia-asociado',
+    title: 'Día del Asociado - Integración Familiar',
+    description: 'Jornada recreativa con actividades deportivas, culturales y lúdicas para asociados y sus familias. Incluye almuerzo y refrigerios.',
+    image: { url: '/images/wcs_default.png', alt: 'Día del asociado' },
+    location: 'Parque Jaime Duque',
+    startsAt: new Date('2025-04-20T08:00:00'),
+    endsAt: new Date('2025-04-20T16:00:00'),
+    tags: ['Recreación'],
+  },
+  {
+    id: '5',
+    slug: 'conferencia-ahorro',
+    title: 'Conferencia: El Ahorro como Herramienta de Transformación',
+    description: 'Expertos del sector cooperativo compartirán estrategias de ahorro efectivas para familias colombianas.',
+    location: 'Auditorio - Sede Principal',
+    startsAt: new Date('2025-10-25T10:00:00'),
+    endsAt: new Date('2025-10-28T12:00:00'),
+    tags: ['Educación'],
+  },
+];
+
+// Comunicados (fieles al domain Announcement)
+const announcements: Announcement[] = [
+  {
+    slug: 'nuevas-tasas-vivienda',
+    title: 'Nuevas tasas de interés para créditos de vivienda',
+    description: 'A partir del 1 de marzo, contaremos con tasas aún más competitivas para créditos de vivienda, con plazos de hasta 20 años.',
+    image: { url: 'https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?q=80&w=1546', alt: 'Créditos de vivienda' },
+    tags: ['Créditos'],
+    pinned: true,
+    priority: 10,
+    publishedAt: new Date('2025-02-28'),
+    createdAt: new Date('2025-02-28'),
+  },
+  {
+    slug: 'asamblea-2025',
+    title: 'Convocatoria Asamblea General Ordinaria 2025',
+    description: 'Convocamos a todos nuestros asociados a la Asamblea General que se realizará el 15 de marzo en nuestro auditorio principal.',
+    image: { url: '/images/wcs_default.png', alt: 'Asamblea' },
+    tags: ['Institucional'],
+    publishedAt: new Date('2025-02-25'),
+    createdAt: new Date('2025-02-25'),
+  },
+  {
+    slug: 'taller-finanzas',
+    title: 'Jornada de educación financiera gratuita',
+    description: 'Inscríbete en nuestro taller "Finanzas personales para alcanzar tus metas" totalmente gratuito para asociados.',
+    image: { url: '/images/wcs_default.png', alt: 'Educación financiera' },
+    tags: ['Educación'],
+    publishedAt: new Date('2025-02-20'),
+    createdAt: new Date('2025-02-20'),
+  },
+  {
+    slug: 'sarlaft-actualizacion',
+    title: 'Actualización de normativas SARLAFT',
+    description: 'Conoce las nuevas disposiciones y procedimientos para el Sistema de Administración de Riesgo de Lavado de Activos.',
+    tags: ['Institucional'],
+    publishedAt: new Date('2025-02-18'),
+    createdAt: new Date('2025-02-18'),
+  },
+  {
+    slug: 'beneficios-asociados',
+    title: 'Nuevos beneficios para asociados activos',
+    description: 'Descuentos exclusivos en comercios aliados, acceso a líneas de crédito preferenciales y más ventajas para ti.',
+    tags: ['Beneficios'],
+    publishedAt: new Date('2025-02-15'),
+    createdAt: new Date('2025-02-15'),
+  },
+];
+
+// ==================== COMPONENTE PRINCIPAL ====================
+
+export default function Home() {
   return (
-    <section>
-      <div className="mx-auto max-w-6xl grid gap-8 sm:grid-cols-3 text-center">
-        <div>
-          <h3 className="text-2xl font-bold text-blue-700">+10 años</h3>
-          <p className="text-sm text-gray-600">de experiencia</p>
-        </div>
-        <div>
-          <h3 className="text-2xl font-bold text-blue-700">50+</h3>
-          <p className="text-sm text-gray-600">convenios vigentes</p>
-        </div>
-        <div>
-          <h3 className="text-2xl font-bold text-blue-700">1000+</h3>
-          <p className="text-sm text-gray-600">clientes satisfechos</p>
-        </div>
-      </div>
-    </section>
-  );
-}
+    <>
+      {/* Contenido principal */}
+      <main>
+        {/* Hero */}
+        <HeroSlider slides={heroSlides} autoPlayInterval={7000} />
 
-//
-async function dataHero(): Promise<HeroFullSlide[]> {
-  const data: any[] = await getCachedAnnouncementsActives(5);
-  return data.map( a => ({
-    title: a.title,
-    description: a.description,
-    image: a.image?.url || '/images/wcs_default.png',
-    cta: a.cta || null,
-    badge: a.tags[0] || null,
-    tone:  a.tone || 'brand',
-  }));
-}
+        {/* Estadísticas */}
+        <Section paddingY="lg" background="muted">
+          <StatsSection stats={stats} />
+        </Section>
 
-async function dataRecommendations(): Promise<TipItem[]> {
-  const data: any[] = await getCachedAnnouncements(5);
-  return data.map( r => ({
-    image: r.image?.url || '/images/wcs_default.png',
-    title: r.title,
-    description: r.description || '',
-    cta: r.cta ? { label: r.cta.label, href: r.cta.href } : undefined,
-    brand: r.badge || undefined,
-    tone: r.tone
-  }));
-}
+        {/* Servicios */}
+        <Section paddingY="xl" background="white" id="servicios" aria-label="Nuestros servicios">
+          <SectionHeader
+            subtitle={homeSections.services.subtitle}
+            title={homeSections.services.title}
+            description={homeSections.services.description}
+            align={homeSections.services.align as 'left' | 'center' | undefined}
+            className="mb-12"
+          />
+          <ServicesSection services={services} viewAllHref="/servicios" maxVisible={3} />
+        </Section>
 
-// (Se elimina fetchRecomendations para evitar fetch relativo en build)
+        {/*Flayer home */}
+        <HighlightSlider slides={[
+          {
+            title: 'Nueva forma de pago',
+            description: 'Ahora puedes realizar tus pagos a través de PSE de manera rápida y segura.',
+            image: '/images/flayers/home_flayer_pse.png',
+            cta: {
+              label: 'Conoce más',
+              href: '/blog/nueva-forma-de-pago-pse',
+            },
+            badge: 'Transaccional',
+            tone: 'blue', // Rojo solidario
+          }
+        ]}/>
+        {/* Novedades - 2 Columnas: Comunicados + Eventos */}
+        {/* Novedades - Bento Grid + Sidebar Compacto */}
+        <Section paddingY="xl" background="white" id="novedades" aria-label="Novedades y actividades">
+          <NewsSection
+            announcements={announcements}
+            events={events}
+            viewAllAnnouncementsHref="/comunicados"
+            viewAllEventsHref="/eventos"
+          />
+        </Section>
 
-export default async function Home() {
-  // Datos mediante casos de uso con Data Cache (evita fetch relativo en build)
-  const heroSlides: HeroFullSlide[] = await dataHero();
-  const featuresLinks = await getCachedFeatures(12);
-  const mapperRecommendations = await dataRecommendations();
-  const eventsRaw: any[] = await getCachedEventsUpcoming(10) as any[];
-  const eventsItems: EventItem[] = (eventsRaw || []).map((e: any) => {
-    const detailSlug = e?.slug ? `/eventos/${e.slug}` : undefined;
-    const fallbackHref = e?.url || e?.href || detailSlug;
-    const ctaHref = e?.cta?.href || fallbackHref;
-    const ctaLabel = e?.cta?.label || (ctaHref ? 'View Details' : undefined);
-    const isExternal = e?.cta?.external ?? (ctaHref ? /^https?:\/\//.test(ctaHref) && !ctaHref.startsWith('/') : false);
-
-    return {
-      image: e?.image?.url || '/images/wcs_default.png',
-      title: e?.title ?? '',
-      description: e?.description ?? '',
-      date: e?.startsAt,
-      endDate: e?.endsAt,
-      location: e?.location,
-      cta: ctaHref && ctaLabel ? { label: ctaLabel, href: ctaHref, external: isExternal } : undefined,
-      published: e?.published ?? true,
-      featured: e?.featured ?? false,
-    } satisfies EventItem;
-  });
-  // Mapeo de iconos desde claves declaradas en la config estática
-  const iconMap: Record<IconKey, React.ElementType<{ className?: string }>> = {
-    target: Target,
-    lightbulb: Lightbulb,
-    users: Users,
-  };
-  const pillars: PillarItem[] = pillarsConfig.map((it) => ({
-    title: it.title,
-    description: it.description,
-    tone: it.tone,
-    href: it.href,
-    icon: it.iconKey ? iconMap[it.iconKey] : undefined,
-  }));
-  return (
-     <div className="flex flex-col">
-      <Section id="sectionHero" ariaLabel="Sección de bienvenida">
-        <HeroFull slides={heroSlides}></HeroFull>
-      </Section>
-      <Section id="sectionPillars" ariaLabel="Misión y visión" pad="standard" tone="none">
-        <SectionHeader
-          className="mb-6"
-          title={homeCopy.pillars.title}
-          description={homeCopy.pillars.description}
-          align="center"
-          tone="green"
-        />
-        <PillarsCompact items={pillars} columns={3} tone="green" />
-        <FeaturesLinks items={featuresLinks} className="mt-10"/>
-      </Section>
-      {/* Pilares de identidad: fondo con degradado (brand → surface) */}
-      <Section id="sectionTips" ariaLabel="Sección de información de interés" pad="standard" tone="green">
-        <SectionHeader title={homeCopy.tips.title} description={homeCopy.tips.description} badge={homeCopy.tips.badge} />
-        <TipsMosaic
-          items={mapperRecommendations}
-          className="mt-10"
-        />
-      </Section>
-      <Section id="sectionEvents" ariaLabel="Eventos y anuncios" pad="standard">
-        <EventsShowcase
-          items={eventsItems}
-          title={homeCopy.events.title}
-          pastLabel="Otros eventos"
-          detailsHref="/eventos"
-          allEventsHref="/eventos"
-          allEventsLabel="Ver todos los eventos"
-        />
-      </Section>
-      <Section id="sectionContact" ariaLabel="Sección de contacto" pad="standard" tone="muted">
-        <ContactCard title={homeCopy.contact.title} subtitle={homeCopy.contact.subtitle} tone={homeCopy.contact.tone} email={contactInfo.email} phone={contactInfo.phone} />
-      </Section>
-      <Section id="sectionFlaterFooter" className="p-5" tone="brand">
-        <h3>{homeCopy.flayers.footer}</h3>
-      </Section>
-    </div>
+        {/* CTA - Llamado a la acción */}
+        <Section paddingY="lg" background="white" id="vinculacion" aria-label="Únete a nosotros">
+          <CTASection
+            title="¿Listo para ser parte de nuestra familia?"
+            description="Únete a miles de colombianos que ya confían en nosotros para construir su futuro financiero. El proceso es rápido, fácil y 100% digital."
+            primaryCTA={{
+              label: 'Vincúlate ahora',
+              href: '/vinculacion',
+            }}
+            secondaryCTA={{
+              label: 'Conocer requisitos',
+              href: '/vinculacion/requisitos',
+            }}
+          />
+        </Section>
+      </main>
+    </>
   );
 }

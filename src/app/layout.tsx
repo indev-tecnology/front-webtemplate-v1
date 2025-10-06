@@ -1,11 +1,12 @@
+import { siteMeta } from "@/config/siteStatic";
 import "./globals.css";
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
 
 export const metadata = {
-  title: "Sitio dinámico",
-  description: "Next.js + MongoDB",
+  title: siteMeta.shortName,
+  description: "Cointramin web site, empresa del sector cooperativo financiero solidario.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

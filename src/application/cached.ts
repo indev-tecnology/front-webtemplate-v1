@@ -29,20 +29,20 @@ const ttl = env.NEXT_REVALIDATE_SECONDS;
 export const getCachedNav = cache(
   async () => new GetNavigation(new MongoNavigationRepository()).exec(),
   [TAGS.NAV],
-  { revalidate: false, tags: [TAGS.NAV] },
+  { tags: [TAGS.NAV] },
 );
 
 export const getCachedFooter = cache(
   async () => new GetFooter(new MongoFooterRepository()).exec(),
   [TAGS.FOOTER],
-  { revalidate: false, tags: [TAGS.FOOTER] },
+  { tags: [TAGS.FOOTER] },
 );
 
 export async function getCachedAnnouncements(limit: number) {
   const fn = cache(
     async () => new ListAnnouncements(new MongoAnnouncementRepository()).exec(limit),
     [TAGS.ANNOUNCEMENTS, `limit:${limit}`],
-    { revalidate: false, tags: [TAGS.ANNOUNCEMENTS] },
+    { tags: [TAGS.ANNOUNCEMENTS] },
   );
   return fn();
 }
@@ -50,7 +50,7 @@ export async function getCachedAnnouncementsActives(limit: number) {
   const fn = cache(
     async () => new ListAnnouncementsActives(new MongoAnnouncementRepository()).exec(limit),
     [TAGS.ANNOUNCEMENTS, `limit:${limit}`],
-    { revalidate: false, tags: [TAGS.ANNOUNCEMENTS] },
+    { tags: [TAGS.ANNOUNCEMENTS] },
   );
   return fn();
 }
@@ -59,7 +59,7 @@ export async function getCachedEventsUpcoming(limit: number) {
   const fn = cache(
     async () => new ListEvents(new MongoEventRepository()).exec(limit),
     [TAGS.EVENTS, `limit:${limit}`],
-    { revalidate: false, tags: [TAGS.EVENTS] },
+    { tags: [TAGS.EVENTS] },
   );
   return fn();
 }
@@ -68,7 +68,7 @@ export async function getCachedFeatures(limit: number) {
   const fn = cache(
     async () => new ListFeatures(new MongoFeatureRepository()).exec(limit),
     [TAGS.FEATURES, `limit:${limit}`],
-    { revalidate: false, tags: [TAGS.FEATURES] },
+    { tags: [TAGS.FEATURES] },
   );
   return fn();
 }
@@ -77,16 +77,28 @@ export async function getCachedRecommendationsLatest(limit: number) {
   const fn = cache(
     async () => new MongoRecommendationRepository().listLatest(limit),
     [TAGS.RECOMMENDATIONS, `limit:${limit}`],
-    { revalidate: false, tags: [TAGS.RECOMMENDATIONS] },
+    { tags: [TAGS.RECOMMENDATIONS] },
   );
   return fn();
 }
 
 export async function getCachedServices() {
+  // Backwards compatible: no-arg call returns full list (default projection applied in repo)
   const fn = cache(
     async () => new ListServices(new MongoServiceRepository()).exec(),
-    [TAGS.SERVICES],
-    { revalidate: false, tags: [TAGS.SERVICES] },
+    [TAGS.SERVICES, 'all'],
+    { tags: [TAGS.SERVICES] }, // revalidate: false no es válido aquí
+  );
+  return fn();
+}
+
+// New helper that accepts limit and keys the cache accordingly
+export async function getCachedServicesWithLimit(limit?: number) {
+  const key = [TAGS.SERVICES, `limit:${limit ?? 'all'}`];
+  const fn = cache(
+    async () => new ListServices(new MongoServiceRepository()).exec(),
+    key,
+    { tags: [TAGS.SERVICES] },
   );
   return fn();
 }
@@ -101,7 +113,7 @@ export async function getCachedAttachments(params: { category?: string; q?: stri
   const fn = cache(
     async () => new ListAttachments(new MongoAttachmentRepository()).exec(params),
     [TAGS.ATTACHMENTS, key],
-    { revalidate: false, tags: [TAGS.ATTACHMENTS] },
+    { tags: [TAGS.ATTACHMENTS] },
   );
   return fn();
 }
@@ -110,7 +122,7 @@ export async function getCachedServiceBySlug(slug: string) {
   const fn = cache(
     async () => new GetServiceBySlug(new MongoServiceRepository()).exec(slug),
     [TAGS.SERVICES, `slug:${slug}`],
-    { revalidate: false, tags: [TAGS.SERVICES] },
+    { tags: [TAGS.SERVICES] },
   );
   return fn();
 }
@@ -119,7 +131,7 @@ export async function getCachedAgreements(): Promise<Agreement[]> {
   const fn = cache(
     async () => new MongoAgreementRepository().listAll(),
     [TAGS.AGREEMENTS],
-    { revalidate: false, tags: [TAGS.AGREEMENTS] },
+    { tags: [TAGS.AGREEMENTS] },
   );
   return fn();
 }
@@ -128,7 +140,7 @@ export async function getCachedAgreementBySlug(slug: string): Promise<Agreement 
   const fn = cache(
     async () => new MongoAgreementRepository().getBySlug(slug),
     [TAGS.AGREEMENTS, `slug:${slug}`],
-    { revalidate: false, tags: [TAGS.AGREEMENTS] },
+    { tags: [TAGS.AGREEMENTS] },
   );
   return fn();
 }

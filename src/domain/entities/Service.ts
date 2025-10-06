@@ -1,23 +1,41 @@
-// src/domain/entities/Service.ts
-import type { BaseDoc, Image } from "./common";
+import { Image } from "./common";
 
-export type Subservice = { name: string; links?: { label: string; href: string }[] };
+type Block =
+  | { type: "heading"; level: 1|2|3; text: string }
+  | { type: "paragraph"; text: string }
+  | { type: "list"; style: "ul"|"ol"; items: string[] }
+  | { type: "image"; attachmentId: string; alt?: string; caption?: string }
+  | { type: "attachment"; attachmentId: String; label?: string }
+  | { type: "cta"; label: string; href: string };
 
-export type ServiceAttachment = {
-  id?: string;
+interface Attachment {
+  id: String;
+  filename: string;
+  url: string;             // S3 signed or public
+  contentType: string;
+  size: number;
+  uploadedAt: Date;
+  tags?: string[];
+  createdBy?: String;
+}
+
+export interface Service {
+  id: String;
   title: string;
-  fileUrl: string;
-  fileType?: string;
-  fileSizeBytes?: number;
-  version?: string;
-};
+  slug: string;            // unique
+  summary?: string;
+  heroImage?: Image;
+  content: Block[];       // cuerpo estructurado
+  subservices?: Array<{ title:string, slug?:string, summary?:string }>; // refs o embebido
+  attachments?: Attachment[]; // referencias a collection Attachment
+  categories?: string[];
+  tags?: string[];
+  seo?: { title?: string; description?: string; canonical?: string };
+  status: "draft"|"review"|"published"|"archived";
+  publishDate?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  author?: string;
+  locale?: string;        // ej. 'es-CO'
+}
 
-export type Service = BaseDoc & {
-  slug: string;           // para URLs limpias
-  name: string;
-  description?: string;
-  icon?: Image;           // o { url } si usas imágenes
-  subservices?: Subservice[];
-  highlights?: string[];  // bullets opcionales
-  attachments?: ServiceAttachment[];
-};

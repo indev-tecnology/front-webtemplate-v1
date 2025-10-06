@@ -1,7 +1,7 @@
 import "../globals.css";
-import { Navbar } from "@/presentation/components/Navbar";
-import { Footer } from "@/presentation/components/Footer";
-import { siteMeta, contactInfo, socialLinks } from "@/config/siteStatic";
+import { Navbar } from "@/presentation/web-ui/Navbar";
+import { Footer } from "@/presentation/web-ui/Footer";
+import { siteMeta, contactInfo, socialLinks, footerSections } from "@/config/siteStatic";
 import { getCachedNav, getCachedFooter } from "@/application/cached";
 
 export const revalidate = 86400;
@@ -19,24 +19,6 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   } catch {
     footer = null;
   }
-  const fallbackFooter = {
-    columns: [
-      {
-        title: "Contacto",
-        links: [
-          contactInfo.email ? { href: `mailto:${contactInfo.email}`, label: contactInfo.email } : null,
-          contactInfo.phone ? { href: `tel:${contactInfo.phone.replace(/\s+/g, '')}`, label: contactInfo.phone } : null,
-          contactInfo.address ? { href: "#", label: contactInfo.address } : null,
-          contactInfo.schedule ? { href: "#", label: contactInfo.schedule } : null,
-        ].filter(Boolean),
-      },
-    ],
-    socials: Object.entries(socialLinks)
-      .filter(([, href]) => typeof href === 'string' && href)
-      .map(([name, href]) => ({ name, href })),
-    note: `© ${new Date().getFullYear()} ${siteMeta.brandName}. Todos los derechos reservados.`,
-  };
-  const footerData = footer && (footer.columns?.length || footer.socials?.length || footer.note) ? footer : fallbackFooter;
   const maintenance = process.env.MAINTENANCE === 'soft';
   
   return (
@@ -46,9 +28,33 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             {process.env.MAINTENANCE_MSG || 'Sitio en mantenimiento. Algunas funciones pueden fallar.'}
           </div>
         )}
-        <Navbar data={nav} />
+        <Navbar
+                logo={
+                  siteMeta.logo ? (
+                    <img
+                      src={siteMeta.logo}
+                      alt={siteMeta.brandName}
+                      className="h-8 md:h-10"
+                    />
+                  ) :
+                  <span className="text-xl md:text-2xl font-bold text-brand">
+                    {siteMeta.brandName}
+                  </span>
+                }
+                links={nav.items || []}
+                ctaLabel="Contáctanos"
+                ctaHref="/contacto"
+                socialLinks={socialLinks}
+                contactInfo={contactInfo}
+              />
         <main className="flex-1">{children}</main>
-        <Footer data={footerData} />
+        {/* Footer */}
+      <Footer
+        sections={footerSections}
+        socialLinks={socialLinks}
+        contactInfo={contactInfo}
+        copyright="© 2025 Cooperativa del Sector Solidario. Vigilada por Supersolidaria. Todos los derechos reservados."
+      />
     </>
   );
 }
