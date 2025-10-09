@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { PageLayout } from '@/presentation/web-ui/layouts/PageLayout';
 import { ServicesWithFilters } from '@/presentation/web-ui/page-sections/ServicesWithFilters';
-import { getCachedServices } from '@/application/cached';
+import { getCachedServices } from '@/application/cached/CacheService';
 
 // ISR: Revalidar cada hora (3600 segundos)
 export const revalidate = 3600;

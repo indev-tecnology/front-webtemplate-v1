@@ -1,7 +1,10 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import type { ToneName } from '@/shared/toneName';
+import { toneClasses } from '@/shared/toneName';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './Button';
 import { clsx } from 'clsx';
@@ -11,6 +14,7 @@ export interface HeroSlide {
   subtitle?: string;
   description: string;
   image: string;
+  tone?: ToneName;
   ctaLabel?: string;
   ctaHref?: string;
   ctaVariant?: 'primary' | 'secondary';
@@ -53,24 +57,33 @@ export const HeroSlider = ({ slides, autoPlayInterval = 6000 }: HeroSliderProps)
   const currentSlide = slides[currentIndex];
 
   return (
-    <div className="relative w-full h-[600px] md:h-[700px] overflow-hidden bg-neutral-900">
-      {/* Background Images */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentIndex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.7 }}
-          className="absolute inset-0"
-        >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${currentSlide.image})` }}
-          />
+    <div className="relative w-full h-[480px] md:h-[560px] overflow-hidden bg-neutral-900">
+      {/* Background Images implemented with next/image + stacked opacity animation to avoid remounts */}
+      <div className="absolute inset-0 pointer-events-none">
+        {slides.map((slide, idx) => (
+          <motion.div
+            key={`bg-${idx}`}
+            initial={false}
+            animate={{ opacity: idx === currentIndex ? 1 : 0 }}
+            transition={{ duration: 0.7 }}
+            className="absolute inset-0"
+            style={{ willChange: 'opacity' }}
+          >
+            <Image
+              src={slide.image}
+              alt={slide.title || `hero-slide-${idx}`}
+              fill
+              priority={idx === 0}
+              sizes="100vw"
+              className="object-cover"
+            />
+          </motion.div>
+        ))}
+        {/* tone-aware overlay: will use current slide tone to slightly adjust overlay classes if provided */}
+        <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/80 to-neutral-900/40" />
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      </div>
 
       {/* Content */}
       <div className="relative h-full container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl">
@@ -85,14 +98,21 @@ export const HeroSlider = ({ slides, autoPlayInterval = 6000 }: HeroSliderProps)
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
                 {currentSlide.subtitle && (
-                  <p className="text-accent text-sm md:text-base font-semibold uppercase tracking-wider mb-3">
+                  <p className={clsx(
+                    'text-sm md:text-base font-semibold uppercase tracking-wider mb-3',
+                    currentSlide.tone ? toneClasses[currentSlide.tone].accent : 'text-accent'
+                  )}>
                     {currentSlide.subtitle}
                   </p>
                 )}
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                <h1 className={clsx(
+                  'text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight',
+                  // use larger sizes but adjust color based on tone (default white)
+                  currentSlide.tone ? 'text-white' : 'text-white'
+                )}>
                   {currentSlide.title}
                 </h1>
-                <p className="text-lg md:text-xl text-neutral-200 mb-8 leading-relaxed">
+                <p className="text-base md:text-lg text-neutral-200 mb-6 leading-relaxed">
                   {currentSlide.description}
                 </p>
                 {currentSlide.ctaLabel && currentSlide.ctaHref && (
@@ -100,6 +120,7 @@ export const HeroSlider = ({ slides, autoPlayInterval = 6000 }: HeroSliderProps)
                     variant={currentSlide.ctaVariant || 'secondary'}
                     size="lg"
                     asChild
+                    className={clsx(currentSlide.tone ? toneClasses[currentSlide.tone].cta : '')}
                   >
                     <a href={currentSlide.ctaHref}>{currentSlide.ctaLabel}</a>
                   </Button>

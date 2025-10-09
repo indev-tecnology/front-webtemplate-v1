@@ -6,8 +6,8 @@ import { Button } from '../Button';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ToneKey } from '@/shared/tone';
 
-export type ServiceTone = 'green' | 'teal' | 'blue' | 'sun' | 'warm' | 'violet' | 'coral';
 
 // Adaptado al domain Service
 export interface Service {
@@ -17,7 +17,7 @@ export interface Service {
   description?: string;
   icon?: { url: string; alt?: string }; // Domain Image type
   highlights?: string[];
-  tone?: ServiceTone;
+  tone?: ToneKey;
 }
 
 export interface ServicesSectionProps {
@@ -28,7 +28,7 @@ export interface ServicesSectionProps {
 
 export const ServicesSection = ({
   services,
-  viewAllHref = '/servicios',
+  viewAllHref = '/services',
   maxVisible = 3
 }: ServicesSectionProps) => {
   // Mostrar solo los primeros N servicios
@@ -53,8 +53,8 @@ export const ServicesSection = ({
   };
 
   // Helper para obtener clases dinámicas según el tone
-  const getToneClasses = (tone?: ServiceTone) => {
-    const toneMap: Record<ServiceTone, {
+  const getToneClasses = (tone?: ToneKey) => {
+    const toneMap: Record<ToneKey, {
       overlayGradient: string;
       accentBorder: string;
       accentBg: string;
@@ -109,6 +109,20 @@ export const ServicesSection = ({
         accentBg: 'bg-tone-coral-500',
         textAccent: 'text-tone-coral-50',
         bulletBg: 'bg-tone-coral-300'
+      },
+      muted: {
+        overlayGradient: 'from-neutral-900/80 via-neutral-800/40 to-transparent',
+        accentBorder: 'border-neutral-500',
+        accentBg: 'bg-neutral-500',
+        textAccent: 'text-neutral-50',
+        bulletBg: 'bg-neutral-400'
+      },
+      brand: {
+        overlayGradient: 'from-brand-900/80 via-brand-800/40 to-transparent',
+        accentBorder: 'border-brand-500',
+        accentBg: 'bg-brand-500',
+        textAccent: 'text-brand-50',
+        bulletBg: 'bg-brand-400'
       }
     };
 
@@ -127,7 +141,7 @@ export const ServicesSection = ({
       >
         {visibleServices.map((service, index) => {
           const toneClasses = getToneClasses(service.tone);
-          const serviceHref = `/servicios/${service.slug}`;
+          const serviceHref = `/services/${service.slug}`;
 
           return (
             <motion.div key={service.id || index} variants={item}>
@@ -229,9 +243,6 @@ export const ServicesSection = ({
           >
             <Link href={viewAllHref} className="flex items-center gap-3">
               <span>Ver todos los servicios</span>
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-brand-500 text-white text-sm group-hover:bg-white group-hover:text-brand-500 transition-all">
-                {services.length}
-              </span>
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>

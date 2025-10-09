@@ -9,6 +9,7 @@ import { StatsSection, type Stat } from '@/presentation/web-ui/home/StatsSection
 import { homeSections } from '@/config/siteStatic';
 import HighlightSlider from '@/presentation/web-ui/shared/HighlightSlider';
 import { getCachedAnnouncements } from '@/application/cached';
+import { getCachedServicesFeed } from '@/application/cached/CacheService';
 
 // ==================== DATOS MOCK ====================
 
@@ -224,10 +225,24 @@ async function fetchAnnouncements(): Promise<HeroSlide[]> {
   return mapper;
 }
 
+async function fetchServices(): Promise<Service[]> {
+  const res = await getCachedServicesFeed(3);
+  return res.map((s) => ({
+    id: s.id,
+    slug: s.slug,
+    name: s.title,
+    summary: s.summary,
+    icon: s.heroImage,
+    tone: s.tone || 'muted',
+    highlights: s.tags,
+  }));
+}
+
 // ==================== COMPONENTE PRINCIPAL (Server Component) ====================
 
 export default async function Home() {
   const heroSlides = await fetchAnnouncements();
+  const services = await fetchServices();
   return (
     <>
       {/* Contenido principal */}

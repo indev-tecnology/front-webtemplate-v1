@@ -1,3 +1,4 @@
+import { ToneKey } from "@/shared/tone";
 import { Image } from "./common";
 
 type Block =
@@ -25,7 +26,7 @@ export interface Service {
   slug: string;            // unique
   summary?: string;
   heroImage?: Image;
-  content: Block[];       // cuerpo estructurado
+  content?: Block[];       // cuerpo estructurado
   subservices?: Array<{ title:string, slug?:string, summary?:string }>; // refs o embebido
   attachments?: Attachment[]; // referencias a collection Attachment
   categories?: string[];
@@ -37,5 +38,6 @@ export interface Service {
   updatedAt: Date;
   author?: string;
   locale?: string;        // ej. 'es-CO'
+  tone?: ToneKey;
 }
 
