@@ -15,7 +15,7 @@ export const PageHero = ({
   title,
   subtitle,
   description,
-  tone = 'green',
+  tone = 'muted',
   align = 'left',
   size = 'default',
   className,
@@ -37,34 +37,34 @@ export const PageHero = ({
       accent: 'bg-orange-600',
     },
     brand: {
-      gradient: '',
-      text: '',
-      accent: ''
+      gradient: 'from-primary-50 to-primary-100',
+      text: 'text-primary-600',
+      accent: 'bg-primary-600',
     },
     teal: {
-      gradient: '',
-      text: '',
-      accent: ''
+      gradient: 'from-teal-50 to-teal-100',
+      text: 'text-teal-600',
+      accent: 'bg-teal-600',
     },
     violet: {
-      gradient: '',
-      text: '',
-      accent: ''
+      gradient: 'from-violet-50 to-violet-100',
+      text: 'text-violet-600',
+      accent: 'bg-violet-600',
     },
     coral: {
-      gradient: '',
-      text: '',
-      accent: ''
+      gradient: 'from-pink-50 to-rose-100',
+      text: 'text-rose-600',
+      accent: 'bg-rose-600',
     },
     sun: {
-      gradient: '',
-      text: '',
-      accent: ''
+      gradient: 'from-yellow-50 to-yellow-100',
+      text: 'text-yellow-600',
+      accent: 'bg-yellow-600',
     },
     muted: {
-      gradient: '',
-      text: '',
-      accent: ''
+      gradient: 'from-neutral-50 to-neutral-100',
+      text: 'text-neutral-600',
+      accent: 'bg-neutral-600',
     }
   };
 

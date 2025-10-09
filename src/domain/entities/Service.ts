@@ -1,25 +1,6 @@
 import { ToneKey } from "@/shared/tone";
 import { Image } from "./common";
 
-type Block =
-  | { type: "heading"; level: 1|2|3; text: string }
-  | { type: "paragraph"; text: string }
-  | { type: "list"; style: "ul"|"ol"; items: string[] }
-  | { type: "image"; attachmentId: string; alt?: string; caption?: string }
-  | { type: "attachment"; attachmentId: string; label?: string }
-  | { type: "cta"; label: string; href: string };
-
-interface Attachment {
-  id: string;
-  filename: string;
-  url: string;             // S3 signed or public
-  contentType: string;
-  size: number;
-  uploadedAt: Date;
-  tags?: string[];
-  createdBy?: String;
-}
-
 export interface Service {
   id: string;
   title: string;

@@ -11,5 +11,10 @@ export type Agreement = BaseDoc & {
   endsAt?: Date;
   links?: { label: string; href: string }[];
   // Optional rich content blocks to render on the detail page
-  content?: any[];
+  content?: Block[];
+  attachments?: Attachment[];
+  createdAt: Date;
+  updatedAt: Date;
+  author?: string;
+  locale?: string; // ej. 'es-CO'
 };

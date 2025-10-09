@@ -46,7 +46,7 @@ export default async function AgreementDetailPage({ params }: AgreementPageProps
         title: agreement.name,
         subtitle: 'Convenios',
         description: agreement.description,
-        tone: 'blue',
+        tone: 'warm',
         align: 'left',
       }}
       breadcrumbs={[{ label: 'Convenios', href: '/agreements' }, { label: agreement.name }]}
