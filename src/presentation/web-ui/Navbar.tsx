@@ -68,7 +68,7 @@ export const Navbar = ({
             <div className="flex items-center gap-3">
               {socialLinks.map((social) => (
                 <Link
-                  key={social.icon}
+                  key={`${social.icon}-${social.href}`}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -132,7 +132,7 @@ export const Navbar = ({
             <div className="flex items-center gap-1">
               {links.map((link) => (
                 <Link
-                  key={link.href}
+                  key={`${link.href}-${link.label}`}
                   href={link.href}
                   onMouseEnter={() => setActiveLink(link.href)}
                   onMouseLeave={() => setActiveLink(null)}
@@ -192,7 +192,7 @@ export const Navbar = ({
             <div className="flex items-center gap-4">
               {links.slice(0, 3).map((link) => (
                 <Link
-                  key={link.href}
+                  key={`${link.href}-${link.label}`}
                   href={link.href}
                   className="text-sm font-medium text-neutral-700 hover:text-brand-600 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 rounded px-2 py-1"
                 >
@@ -243,7 +243,7 @@ export const Navbar = ({
             <div className="px-4 py-4 space-y-1 max-w-7xl mx-auto">
               {links.map((link, index) => (
                 <motion.div
-                  key={link.href}
+                  key={`${link.href}-${index}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}

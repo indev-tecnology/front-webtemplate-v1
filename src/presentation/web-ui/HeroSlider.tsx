@@ -135,7 +135,7 @@ export const HeroSlider = ({ slides, autoPlayInterval = 6000 }: HeroSliderProps)
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
           {slides.map((_, index) => (
             <button
-              key={index}
+              key={`hero-dot-${index}`}
               onClick={() => goToSlide(index)}
               className={clsx(
                 'w-2 h-2 md:w-3 md:h-3 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-accent',

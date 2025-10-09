@@ -10,4 +10,6 @@ export type Agreement = BaseDoc & {
   startsAt?: Date;
   endsAt?: Date;
   links?: { label: string; href: string }[];
+  // Optional rich content blocks to render on the detail page
+  content?: any[];
 };

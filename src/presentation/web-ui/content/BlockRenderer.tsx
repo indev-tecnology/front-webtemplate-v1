@@ -116,7 +116,7 @@ export const BlockRenderer = ({ blocks, attachments = [] }: BlockRendererProps) 
               <Link
                 key={idx}
                 href={block.href}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-accent-600 to-accent-700 text-white font-medium hover:from-accent-700 hover:to-accent-800 transition-all shadow-md hover:shadow-lg"
               >
                 {block.label}
                 <ExternalLink className="w-4 h-4" />

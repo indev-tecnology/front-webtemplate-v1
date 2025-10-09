@@ -106,11 +106,11 @@ export const Footer = ({
             <h3 className="font-bold text-lg mb-4">Síguenos</h3>
             <div className="flex gap-4">
               {socialLinks.map((social) => {
-                const Icon = socialIcons[social.icon];
-                return (
-                  <a
-                    key={social.icon}
-                    href={social.href}
+                    const Icon = socialIcons[social.icon];
+                    return (
+                      <a
+                        key={`${social.icon}-${social.href}`}
+                        href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
