@@ -79,6 +79,7 @@ export const ServiceDetailTemplate = ({ service }: ServiceDetailTemplateProps) =
             fill
             className="object-cover"
             priority
+            sizes="100vw"
           />
         </figure>
       )}

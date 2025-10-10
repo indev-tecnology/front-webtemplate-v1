@@ -16,6 +16,10 @@ const nextConfig = {
       // Desarrollo local (placeholders u otros hosts locales)
       { protocol: 'http', hostname: 'localhost', port: '3000', pathname: '**' },
     ],
+    // Allow explicit quality values used in the code (e.g. quality={90})
+    // Next.js will validate quality values when provided; include 90 to avoid warnings.
+    // See https://nextjs.org/docs/api-reference/next/image
+    qualities: [30, 50, 75, 90],
   },
 };
 

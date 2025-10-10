@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageLayout } from "@/presentation/web-ui/layouts/PageLayout";
 import { DocumentLibrary } from "@/presentation/web-ui/attachments/DocumentLibrary";
 import { CTABox } from "@/presentation/web-ui/shared/CTABox";
-import { apiConsumer } from "@/presentation/adapters/apiConsumer";
+import { getCachedAttachments } from '@/application/cached';
 import { toDate } from "@/shared/date";
 import type { Attachment } from "@/domain/entities/Attachment";
 import { FileText, FolderOpen, Calendar, Shield } from "lucide-react";
@@ -39,8 +39,8 @@ export default async function AnexosInstitucionales({ searchParams }: { searchPa
   const page = Number(get1(sp.page) || 1);
   const pageSize = 100;
 
-  // Solicita attachments sin filtrar por category
-  const { items, total } = await apiConsumer.attachments({ q, page, pageSize });
+  // Solicita attachments sin filtrar por category (usar cache server-side para PDN)
+  const { items, total } = await getCachedAttachments({ q, page, pageSize });
 
   const groups = groupByTopic(items as Attachment[]);
 

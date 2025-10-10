@@ -69,6 +69,7 @@ export const DocumentCard = ({ document, index = 0 }: DocumentCardProps) => {
             src={logoUrl}
             alt="Logo institucional"
             fill
+            sizes="56px"
             className="object-contain p-2"
             onError={() => setImageError(true)}
           />
