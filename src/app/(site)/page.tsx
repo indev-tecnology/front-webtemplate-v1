@@ -8,7 +8,7 @@ import { StatsSection, type Stat } from '@/presentation/web-ui/home/StatsSection
 // Icon names for client-side mapping (do not import icon components here)
 import { homeSections } from '@/config/siteStatic';
 import HighlightSlider from '@/presentation/web-ui/shared/HighlightSlider';
-import { getCachedAnnouncements } from '@/application/cached';
+import { getCachedAnnouncements, getCachedAnnouncementsActives } from '@/application/cached/CacheAnnouncements';
 import { getCachedServicesFeed } from '@/application/cached/CacheService';
 
 // ==================== DATOS MOCK ====================
@@ -211,15 +211,15 @@ const announcements: Announcement[] = [
 ];
 
 // Fetch announcements on the server and render the page as a Server Component
-async function fetchAnnouncements(): Promise<HeroSlide[]> {
-  const res = await getCachedAnnouncements(3);
+async function fetchAnnouncementsActives(): Promise<HeroSlide[]> {
+  const res = await getCachedAnnouncementsActives(5);
   const mapper = res.map((a) => ({
     title: a.title,
     subtitle: a.tags && a.tags.length > 0 ? a.tags[0] : undefined,
     description: a.description || '',
     image: a.image?.url || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1740',
-    ctaLabel: 'Leer más',
-    ctaHref: `/comunicados/${a.slug}`,
+    ctaLabel: a.cta?.label || 'Leer más',
+    ctaHref: a.cta?.href || `/post/${a.slug}`,
     ctaVariant: 'secondary' as const,
   }));
   return mapper;
@@ -238,10 +238,16 @@ async function fetchServices(): Promise<Service[]> {
   }));
 }
 
+async function fetchAnnouncements(): Promise<Announcement[]> {
+  const res = await getCachedAnnouncements(5);
+  return res;
+}
+
 // ==================== COMPONENTE PRINCIPAL (Server Component) ====================
 
 export default async function Home() {
-  const heroSlides = await fetchAnnouncements();
+  const heroSlides = await fetchAnnouncementsActives();
+  const announcements = await fetchAnnouncements();
   const services = await fetchServices();
   return (
     <>

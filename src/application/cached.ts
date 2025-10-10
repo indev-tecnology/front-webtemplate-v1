@@ -35,23 +35,6 @@ export const getCachedFooter = cache(
   { tags: [TAGS.FOOTER] },
 );
 
-export async function getCachedAnnouncements(limit: number) {
-  const fn = cache(
-    async () => new ListAnnouncements(new MongoAnnouncementRepository()).exec(limit),
-    [TAGS.ANNOUNCEMENTS, `limit:${limit}`],
-    { tags: [TAGS.ANNOUNCEMENTS] },
-  );
-  return fn();
-}
-export async function getCachedAnnouncementsActives(limit: number) {
-  const fn = cache(
-    async () => new ListAnnouncementsActives(new MongoAnnouncementRepository()).exec(limit),
-    [TAGS.ANNOUNCEMENTS, `limit:${limit}`],
-    { tags: [TAGS.ANNOUNCEMENTS] },
-  );
-  return fn();
-}
-
 export async function getCachedEventsUpcoming(limit: number) {
   const fn = cache(
     async () => new ListEvents(new MongoEventRepository()).exec(limit),
