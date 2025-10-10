@@ -69,6 +69,7 @@ export const BlockRenderer = ({ blocks, attachments = [] }: BlockRendererProps) 
                     src={attachment.url}
                     alt={block.alt || attachment.filename}
                     fill
+                    sizes="100vw"
                     className="object-cover"
                   />
                 </div>

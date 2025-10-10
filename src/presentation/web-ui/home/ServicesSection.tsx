@@ -155,6 +155,7 @@ export const ServicesSection = ({
                           src={service.icon.url}
                           alt={service.icon.alt || service.name}
                           fill
+                          sizes="(max-width: 640px) 100vw, 50vw"
                           className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         {/* Overlay gradient más fuerte para mejor legibilidad */}

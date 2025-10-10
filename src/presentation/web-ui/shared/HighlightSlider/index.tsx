@@ -150,6 +150,7 @@ export default function HighlightSlider({
                     fill
                     priority
                     quality={90}
+                    sizes="(max-width: 640px) 100vw, 50vw"
                     className="object-cover"
                   />
                   {/* Overlay glass/vidrio sutil */}

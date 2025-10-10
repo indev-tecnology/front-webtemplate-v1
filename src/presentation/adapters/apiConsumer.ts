@@ -27,6 +27,13 @@ export async function getJSON<T>(path: string, opts: GetOpts = {}): Promise<T> {
   const rel = withQS(path, opts.search);
   const base = (env.NEXT_PUBLIC_BASE_URL || '').trim();
   const url = base ? `${base}${rel}` : rel; // permite usar rutas relativas en build/SSR
+
+  // Protección: evitar llamadas server-side a rutas relativas que fallan en PDN/Edge
+  if (!base && typeof window === 'undefined') {
+    throw new Error(
+      "apiConsumer.getJSON: attempted to fetch a relative URL from server-side code without NEXT_PUBLIC_BASE_URL set. On server use the cached application helpers (getCachedAttachments) or set NEXT_PUBLIC_BASE_URL to an absolute URL."
+    );
+  }
   const revalidate = opts.revalidate ?? env.NEXT_REVALIDATE_SECONDS;
   const res = await fetch(url, { next: { revalidate, tags: opts.tag ? [opts.tag] : undefined } });
   if (!res.ok) throw new Error(`HTTP_${res.status}`);
