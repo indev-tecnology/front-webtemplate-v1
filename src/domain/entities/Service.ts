@@ -1,23 +1,5 @@
+import { ToneKey } from "@/shared/tone";
 import { Image } from "./common";
-
-type Block =
-  | { type: "heading"; level: 1|2|3; text: string }
-  | { type: "paragraph"; text: string }
-  | { type: "list"; style: "ul"|"ol"; items: string[] }
-  | { type: "image"; attachmentId: string; alt?: string; caption?: string }
-  | { type: "attachment"; attachmentId: string; label?: string }
-  | { type: "cta"; label: string; href: string };
-
-interface Attachment {
-  id: string;
-  filename: string;
-  url: string;             // S3 signed or public
-  contentType: string;
-  size: number;
-  uploadedAt: Date;
-  tags?: string[];
-  createdBy?: String;
-}
 
 export interface Service {
   id: string;
@@ -25,7 +7,7 @@ export interface Service {
   slug: string;            // unique
   summary?: string;
   heroImage?: Image;
-  content: Block[];       // cuerpo estructurado
+  content?: Block[];       // cuerpo estructurado
   subservices?: Array<{ title:string, slug?:string, summary?:string }>; // refs o embebido
   attachments?: Attachment[]; // referencias a collection Attachment
   categories?: string[];
@@ -37,5 +19,6 @@ export interface Service {
   updatedAt: Date;
   author?: string;
   locale?: string;        // ej. 'es-CO'
+  tone?: ToneKey;
 }
 

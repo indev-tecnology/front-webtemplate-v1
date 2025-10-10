@@ -13,6 +13,7 @@ function map(d: any): Agreement {
     startsAt: d.startsAt,
     endsAt: d.endsAt,
     links: d.links || [],
+    content: d.content || [],
     createdAt: d.createdAt,
     updatedAt: d.updatedAt,
   };

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { X, Filter } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { X } from 'lucide-react';
 import type { Service } from '@/domain/entities/Service';
 
 interface ServiceFiltersProps {
@@ -45,8 +45,8 @@ export const ServiceFilters = ({ services, onFilterChange }: ServiceFiltersProps
     return filtered;
   }, [services, selectedCategory, selectedTags]);
 
-  // Notify parent of filter changes
-  useMemo(() => {
+  // Notify parent of filter changes (useEffect to avoid setting parent state during render)
+  useEffect(() => {
     onFilterChange(filteredServices);
   }, [filteredServices, onFilterChange]);
 
@@ -72,49 +72,58 @@ export const ServiceFilters = ({ services, onFilterChange }: ServiceFiltersProps
   }
 
   return (
-    <div className="mb-8 bg-white rounded-2xl border-2 border-neutral-100 p-6">
+    <div className="mb-12">
+      {/* Header con contador de resultados */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Filter size={20} className="text-primary-600" />
-          <h3 className="font-bold text-lg text-neutral-900">Filtrar servicios</h3>
+        <div>
+          <h2 className="text-2xl font-bold text-neutral-900">
+            {filteredServices.length} {filteredServices.length === 1 ? 'Servicio' : 'Servicios'}
+          </h2>
+          <p className="text-neutral-600 text-sm mt-1">
+            {hasActiveFilters ? 'Filtros aplicados' : 'Mostrando todos los servicios disponibles'}
+          </p>
         </div>
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="text-sm text-neutral-600 hover:text-primary-600 flex items-center gap-1 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-medium text-sm transition-colors"
           >
             <X size={16} />
-            Limpiar filtros
+            Limpiar
           </button>
         )}
       </div>
 
-      <div className="space-y-6">
-        {/* Categories */}
+      {/* Filtros minimalistas */}
+      <div className="space-y-5">
+        {/* Categories - Diseño horizontal minimalista */}
         {categories.length > 0 && (
           <div>
-            <label className="block text-sm font-semibold text-neutral-700 mb-3">
-              Categoría
-            </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+                Categorías
+              </span>
+              <div className="flex-1 h-px bg-neutral-200" />
+            </div>
+            <div className="flex flex-wrap gap-2.5">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 rounded-xl font-medium text-sm transition-all ${
+                className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all ${
                   selectedCategory === 'all'
-                    ? 'bg-primary-500 text-white shadow-md'
-                    : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                    ? 'bg-brand text-white shadow-lg shadow-brand/30'
+                    : 'bg-white border-2 border-neutral-200 text-neutral-700 hover:border-brand-200 hover:text-brand-700'
                 }`}
               >
-                Todos
+                Todas
               </button>
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-xl font-medium text-sm transition-all ${
+                  className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all ${
                     selectedCategory === cat
-                      ? 'bg-primary-500 text-white shadow-md'
-                      : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                      ? 'bg-brand text-white shadow-lg shadow-brand/30'
+                      : 'bg-white border-2 border-neutral-200 text-neutral-700 hover:border-brand-200 hover:text-brand-700'
                   }`}
                 >
                   {cat}
@@ -124,21 +133,24 @@ export const ServiceFilters = ({ services, onFilterChange }: ServiceFiltersProps
           </div>
         )}
 
-        {/* Tags */}
+        {/* Tags - Diseño con chips minimalistas */}
         {tags.length > 0 && (
           <div>
-            <label className="block text-sm font-semibold text-neutral-700 mb-3">
-              Características
-            </label>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+                Características
+              </span>
+              <div className="flex-1 h-px bg-neutral-200" />
+            </div>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <button
                   key={tag}
                   onClick={() => toggleTag(tag)}
-                  className={`px-4 py-2 rounded-xl font-medium text-sm transition-all border-2 ${
+                  className={`px-4 py-2 rounded-full font-medium text-xs transition-all ${
                     selectedTags.has(tag)
-                      ? 'bg-primary-50 border-primary-500 text-primary-700'
-                      : 'bg-white border-neutral-200 text-neutral-700 hover:border-primary-300'
+                      ? 'bg-accent text-neutral-900 shadow-md shadow-accent/30'
+                      : 'bg-neutral-50 text-neutral-600 hover:bg-accent-50 hover:text-accent-700 border border-neutral-200 hover:border-accent-200'
                   }`}
                 >
                   {tag}
@@ -147,14 +159,6 @@ export const ServiceFilters = ({ services, onFilterChange }: ServiceFiltersProps
             </div>
           </div>
         )}
-      </div>
-
-      {/* Results count */}
-      <div className="mt-6 pt-6 border-t border-neutral-100">
-        <p className="text-sm text-neutral-600">
-          Mostrando <span className="font-bold text-neutral-900">{filteredServices.length}</span> de{' '}
-          <span className="font-bold text-neutral-900">{services.length}</span> servicios
-        </p>
       </div>
     </div>
   );

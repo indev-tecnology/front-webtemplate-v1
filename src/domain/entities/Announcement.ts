@@ -13,7 +13,8 @@ export type Announcement = BaseDoc & {
   tags?: string[];           // para búsqueda/filtrado
   priority?: number;         // mayor = primero
   pinned?: boolean;          // anclar arriba
-  publishedAt?: Date;        // inicio de visibilidad
+  publishedAt?: Date;
+  createdAt?: Date        // inicio de visibilidad
   expiresAt?: Date | null;   // fin de visibilidad
   visible?: boolean;         // ocultar sin borrar
   tone?: string; // estilo visual

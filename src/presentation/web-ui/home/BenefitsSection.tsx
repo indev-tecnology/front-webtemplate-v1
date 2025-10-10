@@ -29,7 +29,7 @@ export const BenefitsSection = ({ benefits }: BenefitsSectionProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {benefits.map((benefit, index) => (
           <motion.div
-            key={index}
+            key={`${benefit.title ?? 'benefit'}-${index}`}
             initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-100px' }}

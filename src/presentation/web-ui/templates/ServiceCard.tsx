@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Tag, Folder } from 'lucide-react';
-import { clsx } from 'clsx';
+import { ArrowRight } from 'lucide-react';
 import type { Service } from '@/domain/entities/Service';
 
 export interface ServiceCardProps {
@@ -11,72 +10,76 @@ export interface ServiceCardProps {
 export const ServiceCard = ({ service, href }: ServiceCardProps) => {
   return (
     <Link href={href} className="group block h-full">
-      <article className="relative h-full overflow-hidden rounded-2xl bg-white border-2 border-neutral-200 hover:border-primary-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+      <article className="relative h-full flex flex-col overflow-hidden rounded-xl bg-white border border-neutral-200 hover:border-brand transition-all duration-300 hover:shadow-xl">
 
-        {/* Category badge (top-right) */}
-        {service.categories && service.categories.length > 0 && (
-          <div className="absolute top-4 right-4 z-10">
-            <div className="px-3 py-1 rounded-full text-xs font-semibold bg-primary-500 text-white backdrop-blur-sm bg-opacity-90">
-              {service.categories[0]}
-            </div>
-          </div>
-        )}
-
-        {/* Hero Image or Icon */}
-        <div className="relative h-40 overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-50/30">
+        {/* Hero Image con overlay de categoría */}
+        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-brand to-brand-700">
           {service.heroImage?.url ? (
-            <img
-              src={service.heroImage.url}
-              alt={service.heroImage.alt || service.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+            <>
+              <img
+                src={service.heroImage.url}
+                alt={service.heroImage.alt || service.title}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-900/60 to-transparent" />
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <div className="w-20 h-20 rounded-2xl bg-primary-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+              <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-3xl font-bold border-2 border-white/40">
                 {(service.title || 'S').charAt(0).toUpperCase()}
+              </div>
+            </div>
+          )}
+
+          {/* Category badge */}
+          {service.categories && service.categories.length > 0 && (
+            <div className="absolute top-4 left-4">
+              <div className="px-3 py-1.5 rounded-md text-xs font-bold bg-white text-brand-700 uppercase tracking-wide">
+                {service.categories[0]}
               </div>
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
+        <div className="flex-1 flex flex-col p-6 space-y-3">
           {/* Title */}
-          <h3 className="text-xl font-bold leading-tight text-neutral-900 group-hover:text-primary-600 transition-colors">
+          <h3 className="text-xl font-bold leading-snug text-neutral-900 group-hover:text-brand-700 transition-colors">
             {service.title || 'Servicio'}
           </h3>
 
           {/* Summary */}
           {service.summary && (
-            <p className="text-neutral-600 text-sm leading-relaxed line-clamp-2">
+            <p className="text-neutral-600 text-sm leading-relaxed line-clamp-3 flex-1">
               {service.summary}
             </p>
           )}
 
-          {/* Tags */}
+          {/* Tags - Diseño minimalista */}
           {service.tags && service.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {service.tags.slice(0, 3).map((tag, index) => (
+            <div className="flex flex-wrap gap-1.5 pt-2">
+              {service.tags.slice(0, 2).map((tag, index) => (
                 <span
-                  key={index}
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200"
+                  key={`${tag}-${index}`}
+                  className="px-2.5 py-1 rounded-md text-xs font-semibold bg-accent-50 text-accent-700 border border-accent-200"
                 >
-                  <Tag size={12} />
                   {tag}
                 </span>
               ))}
-              {service.tags.length > 3 && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-neutral-500">
-                  +{service.tags.length - 3}
+              {service.tags.length > 2 && (
+                <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-neutral-100 text-neutral-600">
+                  +{service.tags.length - 2}
                 </span>
               )}
             </div>
           )}
 
-          {/* CTA */}
-          <div className="flex items-center gap-2 font-semibold text-sm pt-2 text-primary-600 group-hover:text-primary-700 group-hover:gap-3 transition-all">
-            <span>Conocer más</span>
-            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+          {/* CTA con línea divisoria */}
+          <div className="pt-4 mt-4 border-t border-neutral-100">
+            <div className="flex items-center justify-between text-sm font-semibold text-brand-600 group-hover:text-brand-700">
+              <span>Ver detalles</span>
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </div>
           </div>
         </div>
       </article>

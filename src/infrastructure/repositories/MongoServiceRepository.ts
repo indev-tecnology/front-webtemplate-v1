@@ -1,6 +1,7 @@
 // src/infrastructure/repositories/MongoServiceRepository.ts
 import { col, COL } from "@/infrastructure/db/mongodb/collections";
 import type { Service } from "@/domain/entities/Service";
+import { title } from "process";
 
 function map(d: any): Service {
   // Map attachments from Service domain definition
@@ -52,6 +53,33 @@ function map(d: any): Service {
     locale: d.locale ?? "es-CO",
   };
 }
+
+function feedMap(d: any): Service {
+  return {
+    id: String(d._id),
+    title: d.title ?? d.name, // Backwards compatible with 'name' field
+    slug: d.slug,
+    summary: d.summary ?? d.description, // Backwards compatible
+    heroImage: d.heroImage ? {
+      url: d.heroImage.url,
+      alt: d.heroImage.alt,
+      width: d.heroImage.width,
+      height: d.heroImage.height,
+    } : undefined,
+    tags: d.tags || d.highlights || [], // Backwards compatible with 'highlights'
+    seo: d.seo ? {
+      title: d.seo.title,
+      description: d.seo.description,
+      canonical: d.seo.canonical,
+    } : undefined,
+    tone: d.tone || "muted",
+    status: d.status || "published",
+    publishDate: d.publishDate ? new Date(d.publishDate) : undefined,
+    createdAt: d.createdAt ? new Date(d.createdAt) : new Date(),
+    updatedAt: d.updatedAt ? new Date(d.updatedAt) : new Date(),
+  };
+};
+
 
 export class MongoServiceRepository {
   /**
@@ -107,5 +135,15 @@ export class MongoServiceRepository {
     const c = await col(COL.SERVICES);
     const d = await c.findOne({ slug });
     return d ? map(d) : null;
+  }
+
+  async getFeedLimit(limit: number): Promise<Service[]> {
+    const c = await col(COL.SERVICES);
+    const cursor = c
+      .find({ status: { $ne: "draft" } }) // Only published/review/archived
+      .sort({ publishDate: -1, createdAt: -1 })
+      .limit(limit);
+    const docs = await cursor.toArray();
+    return docs.map(feedMap);
   }
 }

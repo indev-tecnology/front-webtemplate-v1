@@ -1,5 +1,3 @@
-'use client';
-
 import { HeroSlider, type HeroSlide } from '@/presentation/web-ui/HeroSlider';
 import { Section } from '@/presentation/web-ui/Section';
 import { SectionHeader } from '@/presentation/web-ui/SectionHeader';
@@ -7,51 +5,21 @@ import { ServicesSection, type Service } from '@/presentation/web-ui/home/Servic
 import { NewsSection, type Announcement, type Event } from '@/presentation/web-ui/home/NewsSection';
 import { CTASection } from '@/presentation/web-ui/home/CTASection';
 import { StatsSection, type Stat } from '@/presentation/web-ui/home/StatsSection';
-import {
-  Wallet,
-  PiggyBank,
-  GraduationCap,
-  TrendingUp,
-  Shield,
-  Heart,
-  Users,
-  Award,
-  Briefcase,
-  Home as HomeIcon,
-} from 'lucide-react';
+// Icon names for client-side mapping (do not import icon components here)
 import { homeSections } from '@/config/siteStatic';
 import HighlightSlider from '@/presentation/web-ui/shared/HighlightSlider';
+import { getCachedAnnouncements, getCachedAnnouncementsActives } from '@/application/cached/CacheAnnouncements';
+import { getCachedServicesFeed } from '@/application/cached/CacheService';
 
 // ==================== DATOS MOCK ====================
 
-// Slides del Hero
-const heroSlides: HeroSlide[] = [
-  {
-    title: 'Horarios de atención',
-    subtitle: 'Conoce nuestros horarios',
-    description: 'Luneas a sabado de 9:00 a.m. a 1:00 p.m.',
-    image: 'https://images.unsplash.com/photo-1593501876007-034449c7fd63?q=80&w=1740',
-    ctaLabel: 'Ver mas',
-    ctaHref: '/blog/horarios-atencion',
-    ctaVariant: 'primary',
-  },
-  {
-    title: 'Créditos con tasas preferenciales',
-    subtitle: 'Nuevos beneficios',
-    description: 'Accede a créditos de vivienda, educación y libre inversión con las mejores condiciones del mercado solidario.',
-    image: 'https://images.unsplash.com/photo-1633158829875-e5316a358c6f?q=80&w=1740',
-    ctaLabel: 'Conocer más',
-    ctaHref: '/services/financial-credit',
-    ctaVariant: 'secondary',
-  }
-];
-
 // Estadísticas
+// Use icon names (strings) so they can be serialized from server to client
 const stats: Stat[] = [
-  { icon: Users, value: '25', suffix: 'K+', label: 'Asociados activos' },
-  { icon: Award, value: '15', suffix: '+', label: 'Años de experiencia' },
-  { icon: Briefcase, value: '120', suffix: '+', label: 'Convenios vigentes' },
-  { icon: TrendingUp, value: '$85', suffix: 'M', label: 'Patrimonio administrado' },
+  { icon: 'Users', value: '25', suffix: 'K+', label: 'Asociados activos' },
+  { icon: 'Award', value: '15', suffix: '+', label: 'Años de experiencia' },
+  { icon: 'Briefcase', value: '120', suffix: '+', label: 'Convenios vigentes' },
+  { icon: 'TrendingUp', value: '$85', suffix: 'M', label: 'Patrimonio administrado' },
 ];
 
 // Servicios - Adaptado al domain Service
@@ -61,7 +29,7 @@ const services: Service[] = [
     slug: 'creditos',
     name: 'Créditos',
     description: 'Crédito de libre inversión, vivienda, vehículo y educación con tasas competitivas y plazos flexibles.',
-    icon: { url: 'https://images.unsplash.com/photo-1633158829875-e5316a358c6f?q=80&w=1740', alt: 'Créditos cooperativos' },
+    icon: { url: 'https://wc-web-frontwebtemplate.s3.us-east-1.amazonaws.com/medias/services/services-creditos-30115270-0afb-4622-a5f7-00a6e0232b33.jpg', alt: 'Créditos cooperativos' },
     tone: 'warm',
     highlights: [
       'Tasas desde 0.9% mensual',
@@ -242,9 +210,45 @@ const announcements: Announcement[] = [
   },
 ];
 
-// ==================== COMPONENTE PRINCIPAL ====================
+// Fetch announcements on the server and render the page as a Server Component
+async function fetchAnnouncementsActives(): Promise<HeroSlide[]> {
+  const res = await getCachedAnnouncementsActives(5);
+  const mapper = res.map((a) => ({
+    title: a.title,
+    subtitle: a.tags && a.tags.length > 0 ? a.tags[0] : undefined,
+    description: a.description || '',
+    image: a.image?.url || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1740',
+    ctaLabel: a.cta?.label || 'Leer más',
+    ctaHref: a.cta?.href || `/post/${a.slug}`,
+    ctaVariant: 'secondary' as const,
+  }));
+  return mapper;
+}
 
-export default function Home() {
+async function fetchServices(): Promise<Service[]> {
+  const res = await getCachedServicesFeed(3);
+  return res.map((s) => ({
+    id: s.id,
+    slug: s.slug,
+    name: s.title,
+    summary: s.summary,
+    icon: s.heroImage,
+    tone: s.tone || 'muted',
+    highlights: s.tags,
+  }));
+}
+
+async function fetchAnnouncements(): Promise<Announcement[]> {
+  const res = await getCachedAnnouncements(5);
+  return res;
+}
+
+// ==================== COMPONENTE PRINCIPAL (Server Component) ====================
+
+export default async function Home() {
+  const heroSlides = await fetchAnnouncementsActives();
+  const announcements = await fetchAnnouncements();
+  const services = await fetchServices();
   return (
     <>
       {/* Contenido principal */}

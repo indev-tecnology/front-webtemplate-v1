@@ -112,6 +112,7 @@ MAINTENANCE_MSG="Estamos en mantenimiento, vuelve pronto."
 - `/servicios` (+ subrutas) → TSX
 - `/convenios` → TSX
 - `/anexos` → TSX con listado de documentos dinámicos desde Mongo
+- `/reglamentos` → Página pública para descarga de reglamentos y documentos regulatorios agrupados (nueva)
 - `/maintenance` → Página de mantenimiento
 - `/api/*` → Endpoints de solo de lectura
 
@@ -161,6 +162,12 @@ Esto crea:
 - Un anuncio de bienvenida
 - Un evento próximo
 - Un anexo de ejemplo
+
+### Ruta nueva: /reglamentos
+
+La ruta `/reglamentos` muestra documentos de la categoría `reglamentos` agrupados por etiqueta o versión y ofrece descarga directa. Para probar localmente, asegúrate de que la colección `attachments` tenga documentos con `category: 'reglamentos'`. El script `scripts/seed.ts` ya incluye ejemplos de attachments.
+
+Metadatos mostrados: título, versión, tags, tipo y tamaño. Los enlaces apuntan a `fileUrl` y se usan como descargas públicas.
 
 ---
 

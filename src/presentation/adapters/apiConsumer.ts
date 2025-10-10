@@ -51,6 +51,7 @@ export const apiConsumer = {
 
   services: () => getJSON<Service[]>(`/api/services`, { tag: TAGS.SERVICES }),
   service: (slug: string) => getJSON<Service>(`/api/services/${slug}`, { tag: TAGS.SERVICES }),
+  servicesFeed: (limit: number) => getJSON<Service[]>(`/api/services/feed`, { tag: TAGS.SERVICES, search: { limit } }),
 
   agreements: () => getJSON<Agreement[]>(`/api/agreements`, { tag: TAGS.AGREEMENTS }),
   agreement: (slug: string) => getJSON<Agreement>(`/api/agreements/${slug}`, { tag: TAGS.AGREEMENTS }),

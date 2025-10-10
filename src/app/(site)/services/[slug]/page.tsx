@@ -4,7 +4,7 @@ import { PageLayout } from '@/presentation/web-ui/layouts/PageLayout';
 import { ServiceDetailTemplate } from '@/presentation/web-ui/templates/ServiceDetailTemplate';
 import type { Service } from '@/domain/entities/Service';
 import type { ToneKey } from '@/shared/tone';
-import { getCachedServiceBySlug } from '@/application/cached';
+import { getCachedServiceBySlug } from '@/application/cached/CacheService';
 
 interface ServicePageProps {
   params: Promise<{ slug: string }>;
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
 // Generar rutas estáticas para ISR
 export async function generateStaticParams() {
   try {
-    const { getCachedServices } = await import('@/application/cached');
+    const { getCachedServices } = await import('@/application/cached/CacheService');
     const services = await getCachedServices();
 
     return services.map((service) => ({

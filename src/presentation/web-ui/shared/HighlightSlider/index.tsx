@@ -334,7 +334,7 @@ export default function HighlightSlider({
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
           {slides.map((slide, index) => (
             <button
-              key={index}
+              key={`highlight-dot-${index}`}
               onClick={() => goToSlide(index)}
               disabled={isTransitioning}
               className={`h-2 rounded-full transition-all duration-300 disabled:cursor-not-allowed ${

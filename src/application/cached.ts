@@ -16,9 +16,6 @@ import { MongoFeatureRepository } from '@/infrastructure/repositories/MongoFeatu
 import { MongoRecommendationRepository } from '@/infrastructure/repositories/MongoRecommendationRepository';
 import { MongoAgreementRepository } from '@/infrastructure/repositories/MongoAgreementRepository';
 import type { Agreement } from '@/domain/entities/Agreement';
-import { ListServices } from '@/application/use-cases/Services/ListServices';
-import { MongoServiceRepository } from '@/infrastructure/repositories/MongoServiceRepository';
-import { GetServiceBySlug } from '@/application/use-cases/Services/GetServiceBySlug';
 import { ListAttachments } from '@/application/use-cases/ListAttachments';
 import { MongoAttachmentRepository } from '@/infrastructure/repositories/MongoAttachmentRepository';
 import { ListAnnouncementsActives } from './use-cases/Announcements/ListAnnouncementsActives';
@@ -37,23 +34,6 @@ export const getCachedFooter = cache(
   [TAGS.FOOTER],
   { tags: [TAGS.FOOTER] },
 );
-
-export async function getCachedAnnouncements(limit: number) {
-  const fn = cache(
-    async () => new ListAnnouncements(new MongoAnnouncementRepository()).exec(limit),
-    [TAGS.ANNOUNCEMENTS, `limit:${limit}`],
-    { tags: [TAGS.ANNOUNCEMENTS] },
-  );
-  return fn();
-}
-export async function getCachedAnnouncementsActives(limit: number) {
-  const fn = cache(
-    async () => new ListAnnouncementsActives(new MongoAnnouncementRepository()).exec(limit),
-    [TAGS.ANNOUNCEMENTS, `limit:${limit}`],
-    { tags: [TAGS.ANNOUNCEMENTS] },
-  );
-  return fn();
-}
 
 export async function getCachedEventsUpcoming(limit: number) {
   const fn = cache(
@@ -82,27 +62,6 @@ export async function getCachedRecommendationsLatest(limit: number) {
   return fn();
 }
 
-export async function getCachedServices() {
-  // Backwards compatible: no-arg call returns full list (default projection applied in repo)
-  const fn = cache(
-    async () => new ListServices(new MongoServiceRepository()).exec(),
-    [TAGS.SERVICES, 'all'],
-    { tags: [TAGS.SERVICES] }, // revalidate: false no es válido aquí
-  );
-  return fn();
-}
-
-// New helper that accepts limit and keys the cache accordingly
-export async function getCachedServicesWithLimit(limit?: number) {
-  const key = [TAGS.SERVICES, `limit:${limit ?? 'all'}`];
-  const fn = cache(
-    async () => new ListServices(new MongoServiceRepository()).exec(),
-    key,
-    { tags: [TAGS.SERVICES] },
-  );
-  return fn();
-}
-
 export async function getCachedAttachments(params: { category?: string; q?: string; page?: number; pageSize?: number } = {}) {
   const key = JSON.stringify({
     category: params.category || '',
@@ -114,15 +73,6 @@ export async function getCachedAttachments(params: { category?: string; q?: stri
     async () => new ListAttachments(new MongoAttachmentRepository()).exec(params),
     [TAGS.ATTACHMENTS, key],
     { tags: [TAGS.ATTACHMENTS] },
-  );
-  return fn();
-}
-
-export async function getCachedServiceBySlug(slug: string) {
-  const fn = cache(
-    async () => new GetServiceBySlug(new MongoServiceRepository()).exec(slug),
-    [TAGS.SERVICES, `slug:${slug}`],
-    { tags: [TAGS.SERVICES] },
   );
   return fn();
 }

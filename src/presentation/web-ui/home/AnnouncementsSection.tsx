@@ -5,6 +5,7 @@ import { Card } from '../Card';
 import { Button } from '../Button';
 import { ArrowRight, Pin, Bell, Sparkles } from 'lucide-react';
 import { clsx } from 'clsx';
+import { fmtCo, toDate } from '@/shared/date';
 
 // ==================== TIPOS ====================
 
@@ -18,6 +19,9 @@ export interface Announcement {
   priority?: number;
   publishedAt?: Date;
   createdAt?: Date;
+  // optional tone key to control colors in the UI (e.g. 'green', 'blue', 'violet')
+  tone?: string;
+  toneKey?: string;
 }
 
 export interface AnnouncementsSectionProps {
@@ -50,6 +54,15 @@ const CATEGORY_CONFIG: Record<string, { bg: string; overlay: string }> = {
   },
 };
 
+// New: tone-based palette. Use toneKey/tone to choose color scheme. Defaults to 'green'.
+const TONE_CONFIG: Record<string, { bg: string; overlay: string }> = {
+  green: { bg: 'from-emerald-400/20 to-emerald-600/20', overlay: 'bg-gradient-to-br from-emerald-900/40 to-emerald-800/60' },
+  blue: { bg: 'from-blue-400/20 to-indigo-600/20', overlay: 'bg-gradient-to-br from-blue-900/40 to-indigo-900/60' },
+  violet: { bg: 'from-violet-500/20 to-purple-600/20', overlay: 'bg-gradient-to-br from-violet-900/40 to-purple-900/60' },
+  amber: { bg: 'from-amber-500/20 to-orange-600/20', overlay: 'bg-gradient-to-br from-amber-900/40 to-orange-900/60' },
+  default: { bg: 'from-neutral-400/20 to-neutral-600/20', overlay: 'bg-gradient-to-br from-neutral-800/40 to-neutral-900/60' },
+};
+
 // ==================== UTILIDADES ====================
 
 const getRelativeTime = (date: Date): string => {
@@ -77,6 +90,11 @@ const getCategoryStyle = (category?: string) => {
   return CATEGORY_CONFIG[category] || CATEGORY_CONFIG.default;
 };
 
+const getToneStyle = (toneKey?: string) => {
+  const key = (toneKey || 'green').toString().toLowerCase();
+  return TONE_CONFIG[key] || TONE_CONFIG.default;
+};
+
 // ==================== COMPONENTE PRINCIPAL ====================
 
 export const AnnouncementsSection = ({
@@ -90,7 +108,7 @@ export const AnnouncementsSection = ({
       if (!a.pinned && b.pinned) return 1;
       const aDate = a.publishedAt || a.createdAt || new Date(0);
       const bDate = b.publishedAt || b.createdAt || new Date(0);
-      return bDate.getTime() - aDate.getTime();
+      return toDate(bDate).getTime() - toDate(aDate).getTime();
     })
     .slice(0, 4);
 
@@ -169,11 +187,13 @@ interface BentoCardProps {
 }
 
 const BentoCard = ({ announcement, variants, size }: BentoCardProps) => {
-  const date = announcement.publishedAt || announcement.createdAt || new Date();
+  const date = toDate(announcement.publishedAt || announcement.createdAt || new Date());
   const relativeTime = getRelativeTime(date);
   const isNewAnnouncement = isNew(date);
   const category = announcement.tags?.[0];
   const categoryStyle = getCategoryStyle(category);
+  const toneKey = (announcement.toneKey || announcement.tone || announcement.tags?.[0])?.toString();
+  const toneStyle = getToneStyle(toneKey);
 
   // Altura según tamaño
   const heightClass = size === 'large' ? 'h-80 md:h-96' : 'h-64 md:h-72';
@@ -208,14 +228,14 @@ const BentoCard = ({ announcement, variants, size }: BentoCardProps) => {
             ) : (
               <div className={clsx(
                 'absolute inset-0 bg-gradient-to-br',
-                categoryStyle.bg
+                toneStyle.bg
               )} />
             )}
 
             {/* Overlay gradiente */}
             <div className={clsx(
               'absolute inset-0',
-              categoryStyle.overlay
+              toneStyle.overlay
             )} />
           </div>
 
