@@ -1,10 +1,14 @@
-interface Attachment {
+export interface Attachment {
   id: string;
-  filename: string;
+  name: string;
+  filename?: string;
   url: string;             // S3 signed or public
-  contentType: string;
-  size: number;
-  uploadedAt: Date;
+  type: string;            // MIME type (contentType)
+  contentType?: string;    // Alias for type
+  size?: number;
+  version?: string;
+  description?: string;
+  uploadedAt?: Date;
   tags?: string[];
-  createdBy?: String;
+  createdBy?: string;
 }

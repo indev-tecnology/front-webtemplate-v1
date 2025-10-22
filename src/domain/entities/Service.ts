@@ -1,5 +1,7 @@
 import { ToneKey } from "@/shared/tone";
 import { Image } from "./common";
+import type { Block } from "../shared/Block.type";
+import type { Attachment } from "../shared/Attachment.interface";
 
 export interface Service {
   id: string;

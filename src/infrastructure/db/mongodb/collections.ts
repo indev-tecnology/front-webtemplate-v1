@@ -12,4 +12,5 @@ export const COL = {
   FEATURES: "features",
   RECS: "recommendations",
   PAGES: "pages",
+  ABOUT: "about",
 } as const;

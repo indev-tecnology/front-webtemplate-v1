@@ -1,126 +1,89 @@
-import { FileText, ExternalLink } from 'lucide-react';
+// presentation/web-ui/content/BlockRenderer.tsx
 import Image from 'next/image';
 import Link from 'next/link';
-
-type Block =
-  | { type: "heading"; level: 1 | 2 | 3; text: string }
-  | { type: "paragraph"; text: string }
-  | { type: "list"; style: "ul" | "ol"; items: string[] }
-  | { type: "image"; attachmentId: string; alt?: string; caption?: string }
-  | { type: "attachment"; attachmentId: string; label?: string }
-  | { type: "cta"; label: string; href: string };
+import type { Block } from '@/domain/shared/Block.type';
+import type { Attachment } from '@/domain/shared/Attachment.interface';
+import { cn } from '@/shared/cn';
 
 interface BlockRendererProps {
   blocks: Block[];
-  attachments?: Array<{ id: string; url: string; filename: string; contentType?: string }>;
+  attachments?: Attachment[];
 }
 
-export const BlockRenderer = ({ blocks, attachments = [] }: BlockRendererProps) => {
-  const getAttachment = (id: string) => attachments.find((a) => String(a.id) === id);
+export function BlockRenderer({ blocks, attachments = [] }: BlockRendererProps) {
+  const getAttachment = (attachmentId: string): Attachment | undefined => {
+    return attachments.find((a) => a.id === attachmentId);
+  };
 
   return (
-    <div className="space-y-6">
-      {blocks.map((block, idx) => {
+    <div className="space-y-4">
+      {blocks.map((block, index) => {
+        const key = `block-${index}`;
+
         switch (block.type) {
-          case "heading": {
+          case 'heading':
             const Tag = `h${block.level}` as keyof JSX.IntrinsicElements;
-            const styles = {
-              1: "text-3xl font-bold text-neutral-900 mt-8 mb-4",
-              2: "text-2xl font-semibold text-neutral-800 mt-6 mb-3",
-              3: "text-xl font-medium text-neutral-700 mt-4 mb-2",
-            };
             return (
-              <Tag key={idx} className={styles[block.level]}>
+              <Tag key={key} className="font-bold text-neutral-900 mt-6 mb-3">
                 {block.text}
               </Tag>
             );
-          }
 
-          case "paragraph":
+          case 'paragraph':
             return (
-              <p key={idx} className="text-neutral-700 leading-relaxed">
+              <p key={key} className="text-neutral-700 leading-relaxed mb-4">
                 {block.text}
               </p>
             );
 
-          case "list": {
-            const ListTag = block.style === "ol" ? "ol" : "ul";
-            const listClass = block.style === "ol"
-              ? "list-decimal list-inside space-y-2 text-neutral-700"
-              : "list-disc list-inside space-y-2 text-neutral-700";
-
+          case 'list':
+            const ListTag = block.style === 'ul' ? 'ul' : 'ol';
             return (
-              <ListTag key={idx} className={listClass}>
+              <ListTag key={key} className="mb-4 space-y-2 pl-6 list-disc">
                 {block.items.map((item, i) => (
-                  <li key={i}>{item}</li>
+                  <li key={i} className="text-neutral-700">{item}</li>
                 ))}
               </ListTag>
             );
-          }
 
-          case "image": {
-            const attachment = getAttachment(block.attachmentId);
-            if (!attachment) return null;
-
+          case 'image':
+            const imgAttachment = getAttachment(block.attachmentId);
+            if (!imgAttachment) return null;
             return (
-              <figure key={idx} className="my-6">
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl border-2 border-neutral-200">
-                  <Image
-                    src={attachment.url}
-                    alt={block.alt || attachment.filename}
-                    fill
-                    sizes="100vw"
-                    className="object-cover"
-                  />
-                </div>
-                {block.caption && (
-                  <figcaption className="mt-2 text-sm text-neutral-600 text-center">
-                    {block.caption}
-                  </figcaption>
-                )}
+              <figure key={key} className="my-8">
+                <Image
+                  src={imgAttachment.url}
+                  alt={block.alt || 'Imagen'}
+                  width={block.width || 1200}
+                  height={block.height || 630}
+                  className="rounded-lg"
+                />
               </figure>
             );
-          }
 
-          case "attachment": {
-            const attachment = getAttachment(block.attachmentId);
-            if (!attachment) return null;
-
+          case 'attachment':
+            const fileAttachment = getAttachment(block.attachmentId);
+            if (!fileAttachment) return null;
             return (
               <a
-                key={idx}
-                href={attachment.url}
+                key={key}
+                href={fileAttachment.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 rounded-xl border-2 border-neutral-200 hover:border-primary-500 hover:bg-primary-50/50 transition-all group"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 hover:bg-neutral-200 rounded-lg transition-colors"
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-                  <FileText className="w-5 h-5 text-primary-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-neutral-900 group-hover:text-primary-700 transition-colors">
-                    {block.label || attachment.filename}
-                  </p>
-                  {attachment.contentType && (
-                    <p className="text-sm text-neutral-600">
-                      {attachment.contentType}
-                    </p>
-                  )}
-                </div>
-                <ExternalLink className="w-5 h-5 text-neutral-400 group-hover:text-primary-600 transition-colors" />
+                {block.label || fileAttachment.name}
               </a>
             );
-          }
 
-          case "cta":
+          case 'cta':
             return (
               <Link
-                key={idx}
+                key={key}
                 href={block.href}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-accent-600 to-accent-700 text-white font-medium hover:from-accent-700 hover:to-accent-800 transition-all shadow-md hover:shadow-lg"
+                className="inline-block px-6 py-3 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors"
               >
                 {block.label}
-                <ExternalLink className="w-4 h-4" />
               </Link>
             );
 
@@ -130,4 +93,4 @@ export const BlockRenderer = ({ blocks, attachments = [] }: BlockRendererProps) 
       })}
     </div>
   );
-};
+}

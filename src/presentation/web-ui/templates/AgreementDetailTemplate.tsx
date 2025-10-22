@@ -112,9 +112,10 @@ export const AgreementDetailTemplate = ({ agreement }: AgreementDetailTemplatePr
             blocks={agreement.content}
             attachments={agreement.attachments?.map((a) => ({
               id: a.id,
+              name: a.filename || 'Archivo',
               url: a.url,
-              filename: a.filename,
-              contentType: a.contentType
+              type: a.contentType || 'application/octet-stream',
+              size: a.size
             }))}
           />
         </section>

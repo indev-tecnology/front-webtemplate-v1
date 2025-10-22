@@ -95,9 +95,10 @@ export const ServiceDetailTemplate = ({ service }: ServiceDetailTemplateProps) =
                 blocks={service.content}
                 attachments={service.attachments?.map(a => ({
                   id: String(a.id),
+                  name: a.filename || 'Archivo',
                   url: a.url,
-                  filename: a.filename,
-                  contentType: a.contentType,
+                  type: a.contentType || 'application/octet-stream',
+                  size: a.size
                 }))}
               />
             </section>

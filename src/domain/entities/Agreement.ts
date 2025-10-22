@@ -1,5 +1,7 @@
 // src/domain/entities/Agreement.ts
 import type { BaseDoc, Image } from "./common";
+import type { Block } from "../shared/Block.type";
+import type { Attachment } from "../shared/Attachment.interface";
 
 export type Agreement = BaseDoc & {
   slug: string;

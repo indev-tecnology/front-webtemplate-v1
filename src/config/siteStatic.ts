@@ -42,12 +42,14 @@ export const pillarsConfig: PillarConfigItem[] = [
 export const siteMeta = {
   logo: "/images/web-logo.png", // Logo principal del sitio
   favicon: "/favicon.ico",
+  ogImage: "/images/og-default.jpg", // Imagen por defecto para Open Graph
   keywords:
     "cooperativa, ahorro, crédito, finanzas, servicios financieros, asociados, préstamos, inversión",
   brandName: "Tu Entidad",
   shortName: "Entidad",
   tagline: "Compromiso, innovación y servicio.",
   locale: "es-CO",
+  url: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
 };
 
 // Footer

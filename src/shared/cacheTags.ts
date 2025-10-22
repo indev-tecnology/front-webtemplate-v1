@@ -8,4 +8,5 @@ export const TAGS = {
   AGREEMENTS: "agreements",
   FEATURES: "features",
   RECOMMENDATIONS: "recommendations",
+  ABOUT: "about",
 } as const;
